@@ -21,6 +21,8 @@ By the end of this seminar, participants will:
 
 **Chapter ID**: `1.1-what-is-claude-code`
 
+> 📚 **Deep Dive**: See [KNOWLEDGE.md — Chapter 1.1](./KNOWLEDGE.md#chapter-11-what-is-claude-code) for detailed explanations of agentic execution, terminal-native advantages, and external resources.
+
 ### Content
 
 Claude Code is an agentic coding assistant that runs in your terminal. Unlike chat-based AI tools:
@@ -61,6 +63,8 @@ question: "Can you explain the difference between Claude Code and IDE-based AI t
 ## Chapter 2: Installation & Authentication
 
 **Chapter ID**: `1.2-installation`
+
+> 📚 **Deep Dive**: See [KNOWLEDGE.md — Chapter 1.2](./KNOWLEDGE.md#chapter-12-installation--authentication) for Node.js requirements, authentication methods, and common installation issues.
 
 ### Content
 
@@ -121,6 +125,8 @@ verification:
 
 **Chapter ID**: `1.3-cli-basics`
 
+> 📚 **Deep Dive**: See [KNOWLEDGE.md — Chapter 1.3](./KNOWLEDGE.md#chapter-13-cli-basics) for detailed execution modes, tool visibility, and CLI cheat sheets.
+
 ### Content
 
 #### Starting a Session
@@ -178,6 +184,8 @@ verification:
 ## Chapter 4: CLAUDE.md - Your Project's Memory
 
 **Chapter ID**: `1.4-claude-md`
+
+> 📚 **Deep Dive**: See [KNOWLEDGE.md — Chapter 1.4](./KNOWLEDGE.md#chapter-14-claudemd--project-memory) for file referencing with `@path`, size optimization strategies, progressive disclosure patterns, and real-world CLAUDE.md examples.
 
 ### Content
 
@@ -315,6 +323,8 @@ If your CLAUDE.md exceeds 200 lines, consider:
 
 **Chapter ID**: `1.5-testing-setup`
 
+> 📚 **Deep Dive**: See [KNOWLEDGE.md — Chapter 1.5](./KNOWLEDGE.md#chapter-15-testing-your-setup) for expected responses, debugging context loading issues, and using `/context` effectively.
+
 ### Content
 
 #### Verification Questions
@@ -366,6 +376,8 @@ verification:
 ## Chapter 6: Essential Slash Commands
 
 **Chapter ID**: `1.6-slash-commands`
+
+> 📚 **Deep Dive**: See [KNOWLEDGE.md — Chapter 1.6](./KNOWLEDGE.md#chapter-16-essential-slash-commands) for `/clear` vs `/compact` detailed comparison, session management deep dive, and complete CLI flags reference.
 
 ### Content
 
@@ -500,6 +512,8 @@ verification:
 
 **Chapter ID**: `1.7-plan-mode`
 
+> 📚 **Deep Dive**: See [KNOWLEDGE.md — Chapter 1.7](./KNOWLEDGE.md#chapter-17-plan-mode) for plan output format, evaluating plan quality, good vs poor plan examples, and plan modification techniques.
+
 ### Content
 
 #### What is Plan Mode?
@@ -563,6 +577,8 @@ verification:
 ## Chapter 8: Creating Custom Commands
 
 **Chapter ID**: `1.8-custom-commands`
+
+> 📚 **Deep Dive**: See [KNOWLEDGE.md — Chapter 1.8](./KNOWLEDGE.md#chapter-18-custom-commands) for all frontmatter options, commands with parameters, Skills vs Commands decision tree, and testing commands.
 
 ### Content
 
@@ -682,6 +698,8 @@ verification:
 ## Chapter 9: Commit Your Work
 
 **Chapter ID**: `1.9-commit`
+
+> 📚 **Deep Dive**: See [KNOWLEDGE.md — Chapter 1.9](./KNOWLEDGE.md#chapter-19-commit-your-work) for what to commit decisions, `.gitignore` recommendations, and commit message conventions.
 
 ### Content
 
