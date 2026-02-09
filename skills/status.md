@@ -40,7 +40,7 @@ Dashboard rendering logic shared by course subcommands.
 ║                                                               ║
 ║  [Current status message based on progress]                   ║
 ║                                                               ║
-║  Next step: /course:start [next-module]                       ║
+║  Next step: /cc-course:start [next-module]                    ║
 ╚═══════════════════════════════════════════════════════════════╝
 ```
 
@@ -112,7 +112,7 @@ If progress.json shows no student info:
 ║                                                               ║
 ║  You haven't started the course yet!                          ║
 ║                                                               ║
-║  To begin, type: /course:start 1                              ║
+║  To begin, type: /cc-course:start 1                           ║
 ║                                                               ║
 ║  This will:                                                   ║
 ║  • Set up your profile                                        ║
@@ -128,8 +128,8 @@ If progress.json shows no student info:
 
 Determine next action based on state:
 
-1. If no student info: "Start with /course:start 1"
-2. If current_module exists: "Continue with /course:start [N]"
-3. If module in_progress but paused: "Resume with /course:start [N]"
-4. If module complete, next unlocked: "Ready for /course:start [N+1]"
-5. If all complete: "You've graduated! Consider /course:validate for final review"
+1. If no student info: "Start with /cc-course:start 1"
+2. If current_module exists: "Continue with /cc-course:start [N]"
+3. If module in_progress but paused: "Resume with /cc-course:start [N]"
+4. If module complete, next unlocked: "Ready for /cc-course:start [N+1]"
+5. If all complete: "You've graduated! Consider /cc-course:validate for final review"

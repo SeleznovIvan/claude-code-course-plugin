@@ -80,7 +80,7 @@ not_started → unlocked → in_progress → completed
 | From | To | Trigger |
 |------|-----|---------|
 | not_started | unlocked | Previous module completed (or Module 1) |
-| unlocked | in_progress | User runs /course:start N |
+| unlocked | in_progress | User runs /cc-course:start N |
 | in_progress | completed | All tasks pass validation |
 | locked | unlocked | Prerequisites completed |
 
@@ -90,7 +90,7 @@ not_started → unlocked → in_progress → completed
 
 ### Recording Session Start
 
-When a module is started (e.g., `/course:start 1`):
+When a module is started (e.g., `/cc-course:start 1`):
 
 1. **Get current session ID** using MCP cclogviewer:
    ```
@@ -178,7 +178,7 @@ if all_tasks_done:
 
 Export is offered when:
 1. A module is completed (all tasks pass)
-2. User runs `/course:validate` on a completed module
+2. User runs `/cc-course:validate` on a completed module
 3. User explicitly requests export
 
 ### Export Process

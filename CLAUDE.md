@@ -2,17 +2,43 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-# Claude Code Developer Course
+# Claude Code Developer Course Plugin
 
 > **Learn Claude Code by DOING Claude Code** — An interactive course where you build real Claude Code configurations for your own repository.
 
-## Course Overview
+## Plugin Overview
 
-This is a 5-seminar interactive course that teaches software developers how to use Claude Code effectively. Unlike traditional tutorials, you'll work on YOUR OWN GitHub repository throughout the course, building real configurations you'll actually use.
+This is a Claude Code plugin that provides a 5-module interactive course teaching software developers how to use Claude Code effectively. Unlike traditional tutorials, you'll work on YOUR OWN GitHub repository throughout the course, building real configurations you'll actually use.
+
+## Installation
+
+### Via Plugin Install (Recommended)
+
+```bash
+claude plugin install github:SeleznovIvan/claude-code-course-plugin
+
+# Initialize the bundled MCP server's submodule
+cd ~/.claude/plugins/cc-course
+git submodule update --init --recursive
+```
+
+### Manual Installation
+
+```bash
+# Clone to your plugins directory
+git clone --recurse-submodules https://github.com/SeleznovIvan/claude-code-course-plugin.git ~/.claude/plugins/cc-course
+```
+
+### Development Mode
+
+```bash
+# Run Claude Code with this plugin
+claude --plugin-dir /path/to/cc-course
+```
 
 ## How This Course Works
 
-1. **Start any module** by typing `/course:start 1` through `/course:start 5`
+1. **Start any module** by typing `/cc-course:start 1` through `/cc-course:start 5`
 2. **Claude guides you** through concepts and hands-on tasks
 3. **You implement** everything in your own repository
 4. **Validators check** your work automatically
@@ -21,10 +47,10 @@ This is a 5-seminar interactive course that teaches software developers how to u
 ## Quick Start
 
 ```
-/course:start 1    # Begin with Foundations & Commands
-/course:status     # Check your progress
-/course:validate   # Verify current module completion
-/course:hint       # Get help with current task
+/cc-course:start 1    # Begin with Foundations & Commands
+/cc-course:status     # Check your progress
+/cc-course:validate   # Verify current module completion
+/cc-course:hint       # Get help with current task
 ```
 
 ## Module Overview
@@ -88,50 +114,74 @@ Each seminar SCRIPT.md contains:
 ## File Structure
 
 ```
-claude-code-dev-course/
+cc-course/                       # Plugin root
+├── .claude-plugin/
+│   └── plugin.json              # Plugin manifest
+├── skills/                      # Course commands
+│   ├── start/SKILL.md           # → /cc-course:start
+│   ├── hint/SKILL.md            # → /cc-course:hint
+│   ├── status/SKILL.md          # → /cc-course:status
+│   ├── validate/SKILL.md        # → /cc-course:validate
+│   ├── teaching.md              # Shared teaching methodology
+│   ├── validation.md            # Shared validation logic
+│   ├── hints.md                 # Shared hint system
+│   ├── status.md                # Shared dashboard rendering
+│   └── progress-tracking.md     # Shared state management
+├── mcp/
+│   └── cclogviewer/             # Bundled MCP server (git submodule)
+├── .mcp.json                    # MCP server configuration
+├── lesson-modules/              # Course content
+│   ├── 1-foundations-and-commands/
+│   │   └── SCRIPT.md
+│   ├── 2-skills/
+│   │   └── SCRIPT.md
+│   ├── 3-extensions/
+│   │   └── SCRIPT.md
+│   ├── 4-agents/
+│   │   └── SCRIPT.md
+│   └── 5-workflows/
+│       └── SCRIPT.md
+├── progress.json                # State tracking
 ├── CLAUDE.md                    # You are here
-├── progress.json                # Tracks completion state
-├── curriculum/                  # Original curriculum document
-├── .claude/
-│   └── skills/
-│       └── course/              # Course skill with subcommands
-│           ├── start/SKILL.md   # /course:start - module launcher
-│           ├── hint/SKILL.md    # /course:hint - contextual help
-│           ├── status/SKILL.md  # /course:status - progress dashboard
-│           ├── validate/SKILL.md # /course:validate - check completion
-│           ├── teaching.md      # Shared teaching methodology
-│           ├── validation.md    # Shared validation logic
-│           ├── hints.md         # Shared hint system
-│           ├── status.md        # Shared dashboard rendering
-│           └── progress-tracking.md # Shared state management
-└── lesson-modules/
-    ├── 1-foundations-and-commands/
-    │   └── SCRIPT.md            # Teaching script with verification
-    ├── 2-skills/
-    │   └── SCRIPT.md
-    ├── 3-extensions/
-    │   └── SCRIPT.md
-    ├── 4-agents/
-    │   └── SCRIPT.md
-    └── 5-workflows/
-        └── SCRIPT.md
+└── README.md                    # Installation & usage docs
 ```
+
+## Bundled MCP Server
+
+This plugin includes the **cclogviewer** MCP server for session tracking and analysis:
+
+### Available Tools
+
+- `mcp__cclogviewer__list_sessions` — List sessions for a project
+- `mcp__cclogviewer__get_session_summary` — Get session statistics
+- `mcp__cclogviewer__get_session_logs` — Get full session logs
+- `mcp__cclogviewer__get_session_timeline` — Get session timeline
+- `mcp__cclogviewer__get_session_errors` — Get session errors
+- `mcp__cclogviewer__generate_html` — Generate visual HTML report
+- `mcp__cclogviewer__search_logs` — Search across sessions
+
+### Usage in Course
+
+The cclogviewer MCP is used to:
+- Track learning sessions per module
+- Export session logs on module completion
+- Generate visual reports of learning progress
 
 ## Getting Help
 
-- `/course:hint` — Get contextual help for your current task
-- `/course:status` — See your overall progress
-- `/course:validate` — Check if current module is complete
+- `/cc-course:hint` — Get contextual help for your current task
+- `/cc-course:status` — See your overall progress
+- `/cc-course:validate` — Check if current module is complete
 
 ## Architecture
 
-This course uses Claude Code's extensibility features:
+This course uses Claude Code's plugin system:
 
-- **Skills** (`.claude/skills/course/`): Subcommand skills using colon namespace (`/course:start`, `/course:hint`, etc.)
-- **Shared Logic**: Common functionality extracted to markdown files (teaching.md, validation.md, hints.md, status.md, progress-tracking.md)
+- **Plugin Manifest** (`.claude-plugin/plugin.json`): Defines plugin metadata, skills, and MCP config
+- **Skills** (`skills/`): Subcommand skills using colon namespace (`/cc-course:start`, `/cc-course:hint`, etc.)
+- **Shared Logic**: Common functionality extracted to markdown files
+- **Bundled MCP** (`mcp/cclogviewer/`): Git submodule providing session tracking
 - **Progress tracking** (`progress.json`): Persistent state across sessions
 - **Lesson Scripts** (`lesson-modules/*/SCRIPT.md`): Detailed teaching content with verification criteria
-
-The course uses Progressive Disclosure Architecture (PDA) where each skill loads only the shared logic it needs.
 
 The course teaches learners to build these same features in their own repositories.

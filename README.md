@@ -1,35 +1,64 @@
-# Claude Code Developer Course
+# Claude Code Developer Course Plugin
 
-> **Learn Claude Code IN Claude Code** — An interactive course where developers learn by building real configurations for their own repositories.
+> **Learn Claude Code by DOING Claude Code** — An interactive course where developers learn by building real configurations for their own repositories.
 
 ## What is This?
 
-This is a 5-seminar interactive course that teaches software developers how to use Claude Code effectively. Unlike traditional tutorials:
+This is a Claude Code plugin that provides a 5-module interactive course teaching software developers how to use Claude Code effectively. Unlike traditional tutorials:
 
-- 📁 **You work on YOUR repository** — not toy examples
-- 🤖 **Claude teaches you inside Claude Code** — meta-learning!
-- ✅ **Validators check your work** — know when you're done
-- 🎯 **Role-specific guidance** — frontend, backend, QA, DevOps, data
+- **You work on YOUR repository** — not toy examples
+- **Claude teaches you inside Claude Code** — meta-learning!
+- **Validators check your work** — know when you're done
+- **Role-specific guidance** — frontend, backend, QA, DevOps, data
+
+## Installation
+
+### Option 1: Plugin Install (Recommended)
+
+```bash
+# Install the plugin
+claude plugin install github:SeleznovIvan/claude-code-course-plugin
+
+# Initialize the bundled MCP server
+cd ~/.claude/plugins/cc-course
+git submodule update --init --recursive
+```
+
+### Option 2: Manual Installation
+
+```bash
+# Clone with submodules to your plugins directory
+git clone --recurse-submodules https://github.com/SeleznovIvan/claude-code-course-plugin.git ~/.claude/plugins/cc-course
+```
+
+### Option 3: Development Mode
+
+```bash
+# Clone the repository
+git clone --recurse-submodules https://github.com/SeleznovIvan/claude-code-course-plugin.git
+
+# Run Claude Code with the plugin
+claude --plugin-dir ./claude-code-course-plugin
+```
 
 ## Quick Start
 
-1. **Clone this course** to your machine:
-   ```bash
-   git clone https://github.com/your-org/claude-code-dev-course.git
-   cd claude-code-dev-course
-   ```
+Once installed, start Claude Code and run:
 
-2. **Start Claude Code**:
-   ```bash
-   claude
-   ```
-
-3. **Begin the course**:
-   ```
-   /start-1
-   ```
+```
+/cc-course:start 1
+```
 
 That's it! Claude will guide you from there.
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `/cc-course:start 1` to `/cc-course:start 5` | Begin a specific module |
+| `/cc-course:status` | See your progress |
+| `/cc-course:validate` | Check if current module is complete |
+| `/cc-course:hint` | Get help with current task |
 
 ## Course Structure
 
@@ -42,15 +71,6 @@ That's it! Claude will guide you from there.
 | 5 | **Workflows** | 120 min | GitHub Actions, automation scripts |
 
 **Total time**: ~9-10 hours (at your own pace)
-
-## Commands
-
-| Command | Description |
-|---------|-------------|
-| `/start-1` to `/start-5` | Begin a specific module |
-| `/status` | See your progress |
-| `/validate` | Check if current module is complete |
-| `/hint` | Get help with current task |
 
 ## Who Is This For?
 
@@ -89,6 +109,100 @@ your-repo/
 
 Plus the knowledge to use all of it effectively!
 
+## Bundled MCP Server
+
+This plugin bundles the **cclogviewer** MCP server for session tracking and analysis during the course:
+
+- Track learning sessions per module
+- Export session logs on module completion
+- Generate visual HTML reports of your progress
+- Search and analyze your Claude Code usage
+
+### MCP Tools Available
+
+- `mcp__cclogviewer__list_sessions` — List sessions for a project
+- `mcp__cclogviewer__get_session_summary` — Get session statistics
+- `mcp__cclogviewer__get_session_logs` — Get full session logs
+- `mcp__cclogviewer__get_session_timeline` — Get session timeline
+- `mcp__cclogviewer__get_session_errors` — Get session errors
+- `mcp__cclogviewer__generate_html` — Generate visual HTML report
+- `mcp__cclogviewer__search_logs` — Search across sessions
+
+## Configuration
+
+### Plugin Manifest
+
+The plugin is configured via `.claude-plugin/plugin.json`:
+
+```json
+{
+  "name": "cc-course",
+  "version": "1.0.0",
+  "description": "Interactive Claude Code developer course",
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
+}
+```
+
+### MCP Configuration
+
+The bundled cclogviewer MCP is configured via `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "cclogviewer": {
+      "command": "npx",
+      "args": ["tsx", "${CLAUDE_PLUGIN_ROOT}/mcp/cclogviewer/src/index.ts"],
+      "env": {}
+    }
+  }
+}
+```
+
+## Troubleshooting
+
+### Plugin not loading
+
+1. Verify the plugin is installed:
+   ```bash
+   ls ~/.claude/plugins/cc-course
+   ```
+
+2. Check Claude Code recognizes it:
+   ```bash
+   claude --debug
+   ```
+   Look for plugin loading messages.
+
+### MCP server not starting
+
+1. Ensure submodules are initialized:
+   ```bash
+   cd ~/.claude/plugins/cc-course
+   git submodule update --init --recursive
+   ```
+
+2. Verify the cclogviewer source exists:
+   ```bash
+   ls ~/.claude/plugins/cc-course/mcp/cclogviewer/src/index.ts
+   ```
+
+3. Check if `npx tsx` works:
+   ```bash
+   npx tsx --version
+   ```
+
+### Commands not found
+
+If `/cc-course:*` commands don't appear:
+
+1. Restart Claude Code
+2. Verify skills directory exists:
+   ```bash
+   ls ~/.claude/plugins/cc-course/skills/
+   ```
+
 ## Course Philosophy
 
 1. **Do real work** — Every task applies to your actual project
@@ -105,7 +219,7 @@ Each module has a detailed teaching script in `lesson-modules/[module]/SCRIPT.md
 - **Checklists**: Task lists after each subtheme
 - **Task keys**: Mapping to progress.json for tracking
 
-This structure allows the course-tutor skill to:
+This structure allows Claude to:
 - Verify what was done
 - Explain content systematically
 - Track granular progress

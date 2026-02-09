@@ -1,5 +1,5 @@
 ---
-name: course:validate
+name: cc-course:validate
 description: Check if current module requirements are complete
 ---
 
@@ -13,7 +13,7 @@ Read `progress.json` to find `current_module`.
 
 If no module in progress:
 ```
-No module in progress. Run /course:start 1 to begin.
+No module in progress. Run /cc-course:start 1 to begin.
 ```
 
 ## Validation Logic

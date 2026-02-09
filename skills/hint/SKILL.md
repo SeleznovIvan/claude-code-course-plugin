@@ -1,5 +1,5 @@
 ---
-name: course:hint
+name: cc-course:hint
 description: Get contextual help for your current course task
 argument-hint: "[hint-level 1-4]"
 ---
@@ -30,7 +30,7 @@ Hint for: [Current Task]
 [Hint text based on level]
 
 ---
-Still stuck? Type /course:hint again for more detailed help.
+Still stuck? Type /cc-course:hint again for more detailed help.
 Or describe specifically what's blocking you.
 ```
 
@@ -52,5 +52,5 @@ If no module is in progress:
 
 ```
 You haven't started a module yet.
-Run /course:start 1 to begin the course.
+Run /cc-course:start 1 to begin the course.
 ```

@@ -1,5 +1,5 @@
 ---
-name: course:status
+name: cc-course:status
 description: View your course progress dashboard
 ---
 
@@ -40,7 +40,7 @@ CLAUDE CODE DEVELOPER COURSE
 
 You haven't started the course yet!
 
-To begin, type: /course:start 1
+To begin, type: /cc-course:start 1
 
 This will:
 - Set up your profile

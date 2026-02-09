@@ -1,6 +1,6 @@
 ---
-name: course:start
-description: Start a Claude Code course module. Usage: /course:start 1 (modules 1-5)
+name: cc-course:start
+description: Start a Claude Code course module. Usage: /cc-course:start 1 (modules 1-5)
 argument-hint: "[module-number 1-5]"
 ---
 
@@ -69,13 +69,13 @@ Update `progress.json` per [progress-tracking.md](../progress-tracking.md).
 If the requested module is locked:
 ```
 Module $ARGUMENTS is locked. Complete Module [previous] first.
-Run /course:start [previous] to continue.
+Run /cc-course:start [previous] to continue.
 ```
 
 ### Invalid Argument
 If $ARGUMENTS is not 1-5:
 ```
-Invalid module number. Usage: /course:start 1 (modules 1-5)
+Invalid module number. Usage: /cc-course:start 1 (modules 1-5)
 ```
 
 ### MCP Unavailable

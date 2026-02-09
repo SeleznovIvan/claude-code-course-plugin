@@ -142,7 +142,7 @@ For each module, read the corresponding `lesson-modules/[module]/SCRIPT.md` whic
 
 ## Commands Available
 
-- `/course:start 1` through `/course:start 5` — Start specific module
-- `/course:status` — Show overall progress
-- `/course:validate` — Validate current module
-- `/course:hint` — Get help with current task
+- `/cc-course:start 1` through `/cc-course:start 5` — Start specific module
+- `/cc-course:status` — Show overall progress
+- `/cc-course:validate` — Validate current module
+- `/cc-course:hint` — Get help with current task

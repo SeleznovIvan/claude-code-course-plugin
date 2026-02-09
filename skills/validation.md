@@ -209,5 +209,5 @@ When all checks pass:
 
 6. Show next steps:
    ```
-   Ready for Module [N+1]? Type /course:start [N+1] to continue.
+   Ready for Module [N+1]? Type /cc-course:start [N+1] to continue.
    ```
