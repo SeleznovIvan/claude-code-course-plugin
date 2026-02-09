@@ -12,7 +12,7 @@ This is a 5-seminar interactive course that teaches software developers how to u
 
 ## How This Course Works
 
-1. **Start any module** by typing `/start-1` through `/start-5`
+1. **Start any module** by typing `/course:start 1` through `/course:start 5`
 2. **Claude guides you** through concepts and hands-on tasks
 3. **You implement** everything in your own repository
 4. **Validators check** your work automatically
@@ -21,10 +21,10 @@ This is a 5-seminar interactive course that teaches software developers how to u
 ## Quick Start
 
 ```
-/start-1    # Begin with Foundations & Commands
-/status     # Check your progress
-/validate   # Verify current module completion
-/hint       # Get help with current task
+/course:start 1    # Begin with Foundations & Commands
+/course:status     # Check your progress
+/course:validate   # Verify current module completion
+/course:hint       # Get help with current task
 ```
 
 ## Module Overview
@@ -93,9 +93,17 @@ claude-code-dev-course/
 ├── progress.json                # Tracks completion state
 ├── curriculum/                  # Original curriculum document
 ├── .claude/
-│   ├── commands/                # Slash commands (/start-1, etc.)
 │   └── skills/
-│       └── course-tutor/        # The teaching skill
+│       └── course/              # Course skill with subcommands
+│           ├── start/SKILL.md   # /course:start - module launcher
+│           ├── hint/SKILL.md    # /course:hint - contextual help
+│           ├── status/SKILL.md  # /course:status - progress dashboard
+│           ├── validate/SKILL.md # /course:validate - check completion
+│           ├── teaching.md      # Shared teaching methodology
+│           ├── validation.md    # Shared validation logic
+│           ├── hints.md         # Shared hint system
+│           ├── status.md        # Shared dashboard rendering
+│           └── progress-tracking.md # Shared state management
 └── lesson-modules/
     ├── 1-foundations-and-commands/
     │   └── SCRIPT.md            # Teaching script with verification
@@ -111,17 +119,19 @@ claude-code-dev-course/
 
 ## Getting Help
 
-- `/hint` — Get contextual help for your current task
-- `/status` — See your overall progress
-- `/validate` — Check if current module is complete
+- `/course:hint` — Get contextual help for your current task
+- `/course:status` — See your overall progress
+- `/course:validate` — Check if current module is complete
 
 ## Architecture
 
 This course uses Claude Code's extensibility features:
 
-- **Skills** (`.claude/skills/course-tutor/SKILL.md`): Defines the tutor persona and teaching methodology
-- **Commands** (`.claude/commands/*.md`): Slash commands for `/start-1` through `/start-5`, `/status`, `/validate`, `/hint`
+- **Skills** (`.claude/skills/course/`): Subcommand skills using colon namespace (`/course:start`, `/course:hint`, etc.)
+- **Shared Logic**: Common functionality extracted to markdown files (teaching.md, validation.md, hints.md, status.md, progress-tracking.md)
 - **Progress tracking** (`progress.json`): Persistent state across sessions
 - **Lesson Scripts** (`lesson-modules/*/SCRIPT.md`): Detailed teaching content with verification criteria
+
+The course uses Progressive Disclosure Architecture (PDA) where each skill loads only the shared logic it needs.
 
 The course teaches learners to build these same features in their own repositories.

@@ -1,21 +1,8 @@
----
-name: status
-description: Show your current progress through the Claude Code Developer Course.
----
+# Status Dashboard
 
-# Course Status
+Dashboard rendering logic shared by course subcommands.
 
-Display the learner's progress through all modules.
-
-This command uses the **course-tutor** skill for progress management.
-
-## What to Show
-
-1. Read `progress.json` via course-engine
-2. Display a visual progress dashboard
-3. Show session information if available
-
-## Output Format
+## Dashboard Layout
 
 ```
 ╔═══════════════════════════════════════════════════════════════╗
@@ -31,19 +18,19 @@ This command uses the **course-tutor** skill for progress management.
 ║  MODULE PROGRESS                                              ║
 ╠═══════════════════════════════════════════════════════════════╣
 ║                                                               ║
-║  [✅/🔄/🔒] Module 1: Foundations & Commands  [status]        ║
+║  [icon] Module 1: Foundations & Commands  [status]            ║
 ║      Tasks: [completed]/[total]                               ║
 ║                                                               ║
-║  [✅/🔄/🔒] Module 2: Skills                  [status]        ║
+║  [icon] Module 2: Skills                  [status]            ║
 ║      Tasks: [completed]/[total]                               ║
 ║                                                               ║
-║  [✅/🔄/🔒] Module 3: Extensions              [status]        ║
+║  [icon] Module 3: Extensions              [status]            ║
 ║      Tasks: [completed]/[total]                               ║
 ║                                                               ║
-║  [✅/🔄/🔒] Module 4: Agents                  [status]        ║
+║  [icon] Module 4: Agents                  [status]            ║
 ║      Tasks: [completed]/[total]                               ║
 ║                                                               ║
-║  [✅/🔄/🔒] Module 5: Workflows               [status]        ║
+║  [icon] Module 5: Workflows               [status]            ║
 ║      Tasks: [completed]/[total]                               ║
 ║                                                               ║
 ╠═══════════════════════════════════════════════════════════════╣
@@ -53,43 +40,66 @@ This command uses the **course-tutor** skill for progress management.
 ║                                                               ║
 ║  [Current status message based on progress]                   ║
 ║                                                               ║
-║  Next step: /start-[next-module]                              ║
+║  Next step: /course:start [next-module]                       ║
 ╚═══════════════════════════════════════════════════════════════╝
 ```
 
-## Session Information
-
-If sessions have been recorded, show:
-- Total sessions across all modules
-- Current session ID (if active)
-- Exports available (if any)
-
-```
-╠═══════════════════════════════════════════════════════════════╣
-║  SESSION INFO                                                 ║
-║  Current: abc123-def456                                       ║
-║  Module 1 sessions: 2                                         ║
-║  Exports: 1 available in ./exports/                           ║
-╚═══════════════════════════════════════════════════════════════╝
-```
+---
 
 ## Status Icons
 
-- ✅ = Completed
-- 🔄 = In Progress
-- 🔒 = Locked
-- ⏭️ = Skipped (if any)
+| Status | Icon | Meaning |
+|--------|------|---------|
+| completed | Done | Module finished |
+| in_progress | In Progress | Currently working |
+| unlocked | Ready | Available to start |
+| locked | Locked | Prerequisites not met |
+| skipped | Skipped | Marked as skipped |
+
+---
 
 ## Status Messages
 
 Based on progress, show encouraging message:
 
-- **Just started**: "Welcome! You're about to unlock Claude Code's full potential."
-- **Module 1 done**: "Great foundation! Your project now has memory and custom commands."
-- **Module 2 done**: "Skills created! Claude now knows your team's patterns."
-- **Module 3 done**: "Extensions configured! Automation is working for you."
-- **Module 4 done**: "One module left! You're almost a Claude Code master."
-- **All done**: "🎓 Congratulations! You've completed the course!"
+| Progress | Message |
+|----------|---------|
+| Just started | "Welcome! You're about to unlock Claude Code's full potential." |
+| Module 1 done | "Great foundation! Your project now has memory and custom commands." |
+| Module 2 done | "Skills created! Claude now knows your team's patterns." |
+| Module 3 done | "Extensions configured! Automation is working for you." |
+| Module 4 done | "One module left! You're almost a Claude Code master." |
+| All done | "Congratulations! You've completed the course!" |
+
+---
+
+## Session Information Section
+
+If sessions have been recorded, add:
+
+```
+╠═══════════════════════════════════════════════════════════════╣
+║  SESSION INFO                                                 ║
+║  Current: [session-id]                                        ║
+║  Module 1 sessions: [count]                                   ║
+║  Exports: [count] available in ./exports/                     ║
+╚═══════════════════════════════════════════════════════════════╝
+```
+
+---
+
+## Task Count Calculation
+
+For each module:
+```python
+module_data = progress["modules"][module_key]
+tasks = module_data["tasks"]
+completed = sum(1 for v in tasks.values() if v is True)
+total = len(tasks)
+# Display as: "Tasks: 8/12"
+```
+
+---
 
 ## If No Progress Yet
 
@@ -102,7 +112,7 @@ If progress.json shows no student info:
 ║                                                               ║
 ║  You haven't started the course yet!                          ║
 ║                                                               ║
-║  To begin, type: /start-1                                     ║
+║  To begin, type: /course:start 1                              ║
 ║                                                               ║
 ║  This will:                                                   ║
 ║  • Set up your profile                                        ║
@@ -111,3 +121,15 @@ If progress.json shows no student info:
 ║                                                               ║
 ╚═══════════════════════════════════════════════════════════════╝
 ```
+
+---
+
+## Next Steps Logic
+
+Determine next action based on state:
+
+1. If no student info: "Start with /course:start 1"
+2. If current_module exists: "Continue with /course:start [N]"
+3. If module in_progress but paused: "Resume with /course:start [N]"
+4. If module complete, next unlocked: "Ready for /course:start [N+1]"
+5. If all complete: "You've graduated! Consider /course:validate for final review"
