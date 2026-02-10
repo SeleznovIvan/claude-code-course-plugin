@@ -35,10 +35,48 @@ The plugin's `progress.json` is a template copied to the student repo on first `
 
 ---
 
+## Schema Versioning
+
+The progress.json schema is versioned to support plugin updates and migrations.
+
+### Schema Version Field
+
+```json
+{
+  "schema_version": "1.0",
+  ...
+}
+```
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2026-02-10 | Initial schema with 5 modules, session tracking, exports |
+
+### Migration System
+
+When the plugin is updated with schema changes:
+1. On `/cc-course:start`, version is checked
+2. If student's version is older, migrations run automatically
+3. Progress is preserved, new fields get default values
+4. Backup is created at `progress.json.backup`
+
+For full migration logic, see [migration.md](migration.md).
+
+### Pre-Versioning Compatibility
+
+For progress files created before versioning:
+- Missing `schema_version` is treated as `"1.0"`
+- All applicable migrations run on first start after plugin update
+
+---
+
 ## progress.json Schema
 
 ```json
 {
+  "schema_version": "1.0",
   "student": {
     "name": "string | null",
     "role": "frontend | backend | QA | DevOps | data | fullstack | null",

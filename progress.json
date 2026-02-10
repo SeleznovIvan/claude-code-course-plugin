@@ -1,4 +1,5 @@
 {
+  "schema_version": "1.0",
   "student": {
     "name": null,
     "role": null,

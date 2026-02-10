@@ -12,8 +12,9 @@ Start module **$ARGUMENTS** of the Claude Code Developer Course.
 
 1. Initialize student data directory (if first start)
 2. Read `progress.json` to check learner state
-3. Verify prerequisites (previous modules completed)
-4. Record session start via cclogviewer MCP
+3. **Check schema version and run migrations if needed**
+4. Verify prerequisites (previous modules completed)
+5. Record session start via cclogviewer MCP
 
 ## Student Data Directory Initialization
 
@@ -72,6 +73,99 @@ After initialization, always read/write progress from:
 ```
 
 NOT from the plugin's template `progress.json`.
+
+## Schema Version Check and Migration
+
+Before proceeding with the module start, check if the student's progress.json needs migration.
+
+For the complete migration logic, see [migration.md](../migration.md).
+
+### Migration Check Flow
+
+```python
+CURRENT_VERSION = "1.0"  # Plugin's current schema version
+
+def check_and_migrate(progress, progress_path):
+    """Check schema version and run migrations if needed."""
+
+    student_version = progress.get("schema_version", "1.0")
+
+    if student_version == CURRENT_VERSION:
+        # Same version, no migration needed
+        return progress, None
+
+    if is_newer(student_version, CURRENT_VERSION):
+        # Student has newer version than plugin
+        return None, "plugin_outdated"
+
+    # Student has older version, run migrations
+    backup_path = create_backup(progress_path)
+    try:
+        progress, migrations_run = run_migrations(
+            progress,
+            from_version=student_version,
+            to_version=CURRENT_VERSION
+        )
+        save_progress(progress, progress_path)
+        return progress, migrations_run
+    except Exception as e:
+        return None, f"migration_failed: {e}"
+```
+
+### Handle Migration Results
+
+```python
+result = check_and_migrate(progress, progress_path)
+
+if result[1] == "plugin_outdated":
+    # Show warning
+    print(f"""
+Warning: Your progress file uses schema v{student_version},
+but this plugin only supports up to v{CURRENT_VERSION}.
+
+Please update the plugin:
+  claude plugin update cc-course
+""")
+    # Allow continuing but warn about potential issues
+
+elif result[1] and result[1].startswith("migration_failed"):
+    # Show error and recovery options
+    print(f"""
+Migration failed: {result[1]}
+
+Your original progress has been backed up to:
+  {progress_path}.backup
+
+Options:
+1. Restore backup and try again
+2. Report issue at https://github.com/SeleznovIvan/claude-code-course-plugin/issues
+""")
+    return  # Stop execution
+
+elif result[1]:  # migrations_run list
+    # Show success message
+    print(f"""
+Welcome back! The course plugin has been updated.
+
+Migrating your progress from v{student_version} to v{CURRENT_VERSION}...
+""")
+    for migration in result[1]:
+        print(f"✓ Migration {migration}")
+
+    print("\nYour progress is preserved. Continuing...")
+    progress = result[0]
+
+else:
+    # No migration needed
+    progress = result[0]
+```
+
+### Pre-Versioning Compatibility
+
+For students who started before versioning was added:
+- If `schema_version` field is missing, treat as "1.0"
+- Run all migrations from 1.0 to current version
+- Add `schema_version` field after migration
 
 ## Session Tracking
 
