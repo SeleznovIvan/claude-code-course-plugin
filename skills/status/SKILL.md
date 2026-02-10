@@ -9,7 +9,10 @@ Display the learner's progress through the Claude Code Developer Course.
 
 ## Data Source
 
-Read `progress.json` for all progress data.
+Read progress from the student's repository:
+```
+{student-repo}/.claude/claude-course/progress.json
+```
 
 ## Display Format
 
@@ -20,7 +23,9 @@ For the complete dashboard rendering logic and visual format, read [status.md](.
 - Student info (name, role, repository)
 - Module completion status (completed/in_progress/locked)
 - Task counts per module
+- Submission status per module
 - Overall progress percentage
+- Total submissions count
 - Session information
 - Next steps recommendation
 
@@ -54,3 +59,18 @@ If sessions have been recorded, show:
 - Total sessions across all modules
 - Current session ID (if active)
 - Exports available (if any)
+
+## Submission Info
+
+Show submission status for each module:
+- "Submitted" - Work has been packaged for review
+- "Ready to submit" - Module complete but not yet submitted
+- Empty - Module not yet completed
+
+Show overall submission count: "SUBMISSIONS: X/5 submitted"
+
+If completed modules are not submitted, show reminder:
+```
+Note: Module [N] is complete but not yet submitted.
+Run /cc-course:submit [N] to package your work for instructor review.
+```

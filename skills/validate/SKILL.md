@@ -7,6 +7,15 @@ description: Check if current module requirements are complete
 
 Run validation checks for the current module.
 
+## Progress File Location
+
+Read progress from the student's repository:
+```
+{student-repo}/.claude/claude-course/progress.json
+```
+
+NOT from the plugin template.
+
 ## Determine Module
 
 Read `progress.json` to find `current_module`.
@@ -58,8 +67,35 @@ Result: X/Y checks passed
 When all checks pass:
 1. Set module status to "completed"
 2. Unlock next module
-3. Offer session export
-4. Show summary and next steps
+3. Export session data to `{student-repo}/.claude/claude-course/sessions/`
+4. Prompt for homework submission
+5. Show summary and next steps
+
+### Submission Prompt
+
+After successful validation, prompt the user:
+
+```
+Module complete! Would you like to submit your work for instructor review?
+
+This will package:
+- Your CLAUDE.md and custom commands
+- Progress snapshot
+- Session logs for instructor review
+
+[1] Yes, submit now (Recommended)
+[2] No, I'll submit later with /cc-course:submit
+
+Your work is already validated - submission is for instructor feedback.
+```
+
+If user chooses "Yes":
+- Invoke the submit skill logic (see [submission.md](../submission.md))
+- Create zip in `{student-repo}/.claude/claude-course/submissions/`
+
+If user chooses "No":
+- Show reminder: "Run /cc-course:submit when ready"
+- Continue to next steps
 
 ## Error Handling
 

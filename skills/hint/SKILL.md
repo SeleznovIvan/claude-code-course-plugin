@@ -10,8 +10,9 @@ Provide a hint for the learner's current task.
 
 ## Determine Context
 
-1. Read `progress.json` to find `current_module` and `current_task`
-2. If no active task, guide learner to start a module
+1. Read progress from `{student-repo}/.claude/claude-course/progress.json`
+2. Find `current_module` and `current_task`
+3. If no active task, guide learner to start a module
 
 ## Hint Level
 

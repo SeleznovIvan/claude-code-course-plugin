@@ -10,9 +10,68 @@ Start module **$ARGUMENTS** of the Claude Code Developer Course.
 
 ## Before Starting
 
-1. Read `progress.json` to check learner state
-2. Verify prerequisites (previous modules completed)
-3. Record session start via cclogviewer MCP
+1. Initialize student data directory (if first start)
+2. Read `progress.json` to check learner state
+3. Verify prerequisites (previous modules completed)
+4. Record session start via cclogviewer MCP
+
+## Student Data Directory Initialization
+
+On first `/cc-course:start`, create the student data directory structure:
+
+### Check if First Start
+
+```python
+student_repo = detect_student_repo()  # from cwd or ask user
+course_data_dir = f"{student_repo}/.claude/claude-course"
+
+if not os.path.exists(course_data_dir):
+    initialize_student_data(student_repo)
+```
+
+### Initialize Structure
+
+Create the following structure in the student's repository:
+
+```
+{student-repo}/.claude/claude-course/
+├── progress.json    # Copy from plugin template and initialize
+├── sessions/        # Empty directory for session exports
+└── submissions/     # Empty directory for homework archives
+```
+
+### Initialize progress.json
+
+1. Copy the template from the plugin's `progress.json`
+2. Set initial student info:
+   ```json
+   {
+     "student": {
+       "name": null,
+       "role": null,
+       "repository": "{student-repo}",
+       "started_at": "{ISO timestamp}"
+     }
+   }
+   ```
+3. Ask the user for their name and role (if not already set)
+
+### Directory Creation
+
+Using Bash:
+```bash
+mkdir -p {student-repo}/.claude/claude-course/sessions
+mkdir -p {student-repo}/.claude/claude-course/submissions
+```
+
+### Progress Path
+
+After initialization, always read/write progress from:
+```
+{student-repo}/.claude/claude-course/progress.json
+```
+
+NOT from the plugin's template `progress.json`.
 
 ## Session Tracking
 

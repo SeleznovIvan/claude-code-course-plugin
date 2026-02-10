@@ -2,6 +2,39 @@
 
 State management logic shared by course subcommands.
 
+## Student Data Location
+
+All student-specific data is stored in the student's repository:
+
+```
+{student-repo}/.claude/claude-course/
+├── progress.json                    # Student progress tracking
+├── sessions/                        # Session exports from MCP
+│   ├── {session-id}-logs.json
+│   └── {session-id}-summary.json
+└── submissions/                     # Homework archives
+    └── seminar1-jane-doe-2026-02-10.zip
+```
+
+### Path Resolution
+
+```python
+student_repo = progress["student"]["repository"]
+course_data_dir = f"{student_repo}/.claude/claude-course"
+progress_path = f"{course_data_dir}/progress.json"
+sessions_dir = f"{course_data_dir}/sessions"
+submissions_dir = f"{course_data_dir}/submissions"
+```
+
+### Plugin vs Student Data
+
+- **Plugin folder** (`~/.claude/plugins/cc-course/`): Skills, SCRIPT.md files, validation logic
+- **Student repo** (`{student-repo}/.claude/claude-course/`): Progress, sessions, submissions
+
+The plugin's `progress.json` is a template copied to the student repo on first `/cc-course:start`.
+
+---
+
 ## progress.json Schema
 
 ```json
@@ -37,6 +70,11 @@ State management logic shared by course subcommands.
         "use_plan_mode": false,
         "create_custom_command": false,
         "commit_work": false
+      },
+      "submission": {
+        "submitted_at": "ISO timestamp | null",
+        "file_path": "string | null",
+        "file_size_bytes": "number | null"
       }
     },
     "2-skills": { ... },
@@ -63,6 +101,24 @@ State management logic shared by course subcommands.
   }
 }
 ```
+
+### Submission Field
+
+Each module includes a `submission` object to track homework submissions:
+
+```json
+"submission": {
+  "submitted_at": "2026-02-10T14:30:00Z",
+  "file_path": "{student-repo}/.claude/claude-course/submissions/seminar1-jane-doe-2026-02-10.zip",
+  "file_size_bytes": 45678
+}
+```
+
+- `submitted_at`: ISO timestamp of when submission was created
+- `file_path`: Absolute path to the submission zip file
+- `file_size_bytes`: Size of the zip file in bytes
+
+When no submission exists, the field is `null` or has null values.
 
 ---
 
@@ -184,29 +240,45 @@ Export is offered when:
 
 1. **Gather session IDs** from `modules[module].sessions`
 
-2. **Export each session**:
+2. **Export each session** to student's data directory:
    ```
    mcp__cclogviewer__get_session_logs(
      session_id=session_id,
-     output_path="./exports/seminar[N]-session-{session_id}.json"
-   )
-
-   mcp__cclogviewer__get_session_summary(
-     session_id=session_id,
-     output_path="./exports/seminar[N]-summary-{session_id}.json"
+     project=student_repo
    )
    ```
+   Save output to: `{student-repo}/.claude/claude-course/sessions/{session_id}-logs.json`
+
+   ```
+   mcp__cclogviewer__get_session_summary(
+     session_id=session_id,
+     project=student_repo
+   )
+   ```
+   Save output to: `{student-repo}/.claude/claude-course/sessions/{session_id}-summary.json`
 
 3. **Generate visual report** (optional):
    ```
    mcp__cclogviewer__generate_html(
      session_id=primary_session,
-     output_path="./exports/seminar[N]-report.html",
+     output_path="{student-repo}/.claude/claude-course/sessions/seminar[N]-report.html",
      open_browser=true
    )
    ```
 
 4. **Record export** in progress.json under `exports[]`
+
+### Session Data in Submissions
+
+When creating a submission, the session data files are included in the zip:
+```
+submissions/seminar1-jane-doe-2026-02-10.zip
+└── sessions/
+    ├── {session-id-1}-logs.json
+    ├── {session-id-1}-summary.json
+    ├── {session-id-2}-logs.json
+    └── {session-id-2}-summary.json
+```
 
 ---
 
