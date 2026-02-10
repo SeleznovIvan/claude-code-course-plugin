@@ -6,10 +6,27 @@
 
 ---
 
+## Before You Begin
+
+**Complete the installation before starting this interactive seminar.**
+
+📄 **[Download Installation Guide (PDF)](./installation-guide.pdf)** — Follow these steps offline:
+1. Install Node.js 18+
+2. Install Claude Code via npm
+3. Authenticate with Anthropic
+4. Verify with `/doctor`
+
+Once Claude Code is installed and working, return here and run:
+```bash
+claude
+/cc-course:start 1
+```
+
+---
+
 ## Learning Objectives
 
 By the end of this seminar, participants will:
-- Install and authenticate Claude Code in their development environment
 - Navigate basic CLI interactions confidently
 - Create a CLAUDE.md file that captures their project's context
 - Use slash commands fluently for common operations
@@ -43,15 +60,6 @@ Claude Code is an agentic coding assistant that runs in your terminal. Unlike ch
 | Execution | Can run commands | Suggestions only |
 | Memory | CLAUDE.md persistence | Session only |
 
-### Verification
-
-```yaml
-chapter: 1.1-what-is-claude-code
-type: conceptual
-verification: manual
-question: "Can you explain the difference between Claude Code and IDE-based AI tools?"
-```
-
 ### Checklist
 
 - [ ] Understand what "agentic" means in the context of coding assistants
@@ -64,52 +72,17 @@ question: "Can you explain the difference between Claude Code and IDE-based AI t
 
 **Chapter ID**: `1.2-installation`
 
-> 📚 **Deep Dive**: See [KNOWLEDGE.md — Chapter 1.2](./KNOWLEDGE.md#chapter-12-installation--authentication) for Node.js requirements, authentication methods, and common installation issues.
+> ⚠️ **Prerequisite**: You should have already completed the [Installation Guide (PDF)](./installation-guide.pdf) before starting this interactive course.
 
-### Content
+If you haven't installed Claude Code yet, please complete the PDF guide first, then return here.
 
-#### Step 1: Install Claude Code
+### Quick Verification
 
-```bash
-npm install -g @anthropic-ai/claude-code
-```
-
-#### Step 2: Verify Installation
+Confirm your installation is working:
 
 ```bash
-claude --version
-```
-
-Expected output: Version number (e.g., `1.x.x`)
-
-#### Step 3: First Launch
-
-```bash
-claude
-```
-
-On first launch, Claude Code will:
-1. Open browser for authentication
-2. Request API key or OAuth connection
-3. Complete initial setup wizard
-
-#### Step 4: Verify Authentication
-
-```bash
-claude "Hello, can you hear me?"
-```
-
-If Claude responds, authentication is complete.
-
-### Verification
-
-```yaml
-chapter: 1.2-installation
-type: automated
-verification:
-  command: "which claude && claude --version"
-  success_pattern: "claude-code"
-  task_key: install_claude_code
+claude --version    # Should show version number
+claude /doctor      # Should show all checks passing
 ```
 
 ### Checklist
@@ -117,7 +90,7 @@ verification:
 - [ ] Claude Code installed globally via npm
 - [ ] `claude --version` returns a version number
 - [ ] Successfully authenticated (first session works)
-- [ ] Can run `claude` and get a response
+- [ ] `/doctor` shows all checks passing
 
 ---
 
@@ -158,19 +131,6 @@ Claude shows what tools it's using:
 2. Ask: "What files are in the current directory?"
 3. Ask: "What is the main purpose of this project?"
 4. Exit the session
-
-### Verification
-
-```yaml
-chapter: 1.3-cli-basics
-type: manual
-verification:
-  questions:
-    - "Start an interactive Claude session"
-    - "Ask Claude to list files in your project"
-    - "Exit the session gracefully"
-  task_key: basic_cli_usage
-```
 
 ### Checklist
 
@@ -822,12 +782,9 @@ mcp__cclogviewer__generate_html(
 
 ```yaml
 seminar: 1-foundations-and-commands
+# Note: Chapters 1-3 (installation, authentication, CLI basics) are covered
+# in the offline Installation Guide PDF. Validation starts from Chapter 4.
 tasks:
-  install_claude_code:
-    chapter: 1.2
-    type: automated
-    check: "command -v claude"
-
   create_claude_md:
     chapter: 1.4
     type: automated

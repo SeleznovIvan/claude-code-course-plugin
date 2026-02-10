@@ -19,11 +19,8 @@ Track hint level in progress.json under current task.
 
 ### Module 1: Foundations
 
-#### install_claude_code
-- **L1**: "Have you tried running `npm install -g @anthropic-ai/claude-code`?"
-- **L2**: "Make sure you have Node.js 18+ installed. Check with `node --version`."
-- **L3**: "Let's troubleshoot: What error do you see when running the install command?"
-- **L4**: "Let me help. Run these commands one at a time and tell me what happens..."
+> Note: Installation and authentication are covered in the offline Installation Guide PDF.
+> Hints below start from CLAUDE.md creation (Chapter 4).
 
 #### create_claude_md
 - **L1**: "Try running `/init` inside a Claude Code session in your repo."

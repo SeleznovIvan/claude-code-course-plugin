@@ -26,7 +26,6 @@ State management logic shared by course subcommands.
         }
       ],
       "tasks": {
-        "install_claude_code": false,
         "create_claude_md": false,
         "claude_md_quality": false,
         "add_project_overview": false,
