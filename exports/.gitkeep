@@ -1,0 +1,59 @@
+# Session Exports Directory
+
+This directory stores exported session logs from the Claude Code Developer Course.
+
+## What Gets Exported
+
+When you complete a seminar module, the course engine can export your session data:
+
+| File | Description |
+|------|-------------|
+| `seminarN-session-{uuid}.json` | Full session log with all messages and tool calls |
+| `seminarN-summary-{uuid}.json` | Summary stats (duration, tool usage, errors) |
+| `seminarN-report.html` | Visual HTML report (optional) |
+
+## When Export Happens
+
+Export is offered:
+1. When you complete all tasks in a module (`/validate` passes)
+2. When you explicitly request export during validation
+
+## Manual Export
+
+If you want to export a session manually:
+
+```bash
+# In a Claude Code session, use the cclogviewer MCP:
+
+# List recent sessions
+mcp__cclogviewer__list_sessions(project="<your-repo>", days=7)
+
+# Export session logs
+mcp__cclogviewer__get_session_logs(
+  session_id="<session-uuid>",
+  output_path="./exports/my-session.json"
+)
+
+# Generate HTML report
+mcp__cclogviewer__generate_html(
+  session_id="<session-uuid>",
+  output_path="./exports/my-report.html",
+  open_browser=true
+)
+```
+
+## Privacy Notes
+
+- Session logs contain your conversation with Claude
+- Logs may include file paths and code snippets from your repository
+- Consider this before sharing exports
+
+## Cleaning Up
+
+To remove old exports:
+
+```bash
+rm exports/seminar*-*.json exports/seminar*-*.html
+```
+
+Keep this `.gitkeep` file to preserve the directory in git.
