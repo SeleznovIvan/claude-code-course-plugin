@@ -1,0 +1,8 @@
+# Local Claude Code settings
+.claude/settings.local.json
+
+# Curriculum source files
+curriculum/
+
+# Local docs
+docs/

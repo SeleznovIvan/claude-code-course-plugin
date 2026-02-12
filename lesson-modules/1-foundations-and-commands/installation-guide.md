@@ -155,7 +155,6 @@ claude
 | `/help` | Show all available commands |
 | `/doctor` | Diagnose installation issues |
 | `/clear` | Reset conversation context |
-| `/cost` | Show token usage |
 | `exit` | End the session |
 
 ### Keyboard Shortcuts

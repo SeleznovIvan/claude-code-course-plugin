@@ -34,6 +34,25 @@ By the end of this seminar, participants will:
 
 ---
 
+## Chapter Phase Map
+
+Quick reference showing which interactive phases each chapter has:
+
+| Chapter | PRESENT | CHECKPOINT | ACTION | VERIFY |
+|---------|---------|------------|--------|--------|
+| 1 — What is Claude Code? | yes | yes | — | — |
+| 2 — Installation | yes | yes | — | — |
+| 3 — CLI Basics | yes | yes | — | — |
+| 4 — CLAUDE.md | yes | yes | yes | yes |
+| 5 — Testing Setup | yes | yes | yes | yes |
+| 6 — Slash Commands | yes | yes | yes | yes |
+| 6b — Session Management | yes | — | yes | yes |
+| 7 — Plan Mode | yes | yes | yes | yes |
+| 8 — Custom Commands | yes | yes | yes | yes |
+| 9 — Commit | yes | — | yes | yes |
+
+---
+
 ## Chapter 1: What is Claude Code?
 
 **Chapter ID**: `1.1-what-is-claude-code`
@@ -60,6 +79,14 @@ Claude Code is an agentic coding assistant that runs in your terminal. Unlike ch
 | Execution | Can run commands | Suggestions only |
 | Memory | CLAUDE.md persistence | Session only |
 
+### Instructor: Checkpoint
+
+Ask the student using AskUserQuestion:
+- **Question**: "Do you understand the key differences between Claude Code and other AI coding tools (like Copilot/Cursor)? The main points are: terminal-native, full codebase awareness, agentic execution, and memory persistence."
+- **Options**: "Yes, I understand — let's continue" / "I have a question" / "I need more explanation"
+- On questions: answer them, then re-ask
+- On "need more explanation": elaborate on the agentic execution model and CLAUDE.md persistence, then re-ask
+
 ### Checklist
 
 - [ ] Understand what "agentic" means in the context of coding assistants
@@ -84,6 +111,14 @@ Confirm your installation is working:
 claude --version    # Should show version number
 claude /doctor      # Should show all checks passing
 ```
+
+### Instructor: Checkpoint
+
+Ask the student using AskUserQuestion:
+- **Question**: "Since you're already in a Claude Code session right now, your installation is working. Can you confirm that `/doctor` showed all checks passing when you set up?"
+- **Options**: "Yes, all good" / "I had some issues" / "I haven't checked"
+- On issues: help troubleshoot before proceeding
+- On "haven't checked": note it but proceed since they're clearly running Claude Code
 
 ### Checklist
 
@@ -131,6 +166,13 @@ Claude shows what tools it's using:
 2. Ask: "What files are in the current directory?"
 3. Ask: "What is the main purpose of this project?"
 4. Exit the session
+
+### Instructor: Checkpoint
+
+Ask the student using AskUserQuestion:
+- **Question**: "Do you understand the three ways to run Claude Code? (`claude` for interactive, `claude \"prompt\"` for one-shot, `claude -p \"prompt\"` for print mode)"
+- **Options**: "Yes, clear" / "Can you explain the difference again?"
+- On "explain again": clarify that interactive is for back-and-forth, one-shot runs and exits, print mode outputs text only (useful for scripts/piping)
 
 ### Checklist
 
@@ -267,6 +309,48 @@ If your CLAUDE.md exceeds 200 lines, consider:
 - Using `.claude/settings.json` for project-specific settings
 - Creating skills in `.claude/skills/` for reusable instructions
 
+### Instructor: Checkpoint
+
+Ask the student using AskUserQuestion:
+- **Question**: "Do you understand why CLAUDE.md matters and what sections it should contain? (Overview, Tech Stack, Conventions, Commands)"
+- **Options**: "Yes, I understand the purpose and structure" / "I have a question" / "Can you show an example?"
+- On "show an example": walk through a concrete CLAUDE.md for their role/stack
+- On questions: answer, then re-ask
+
+### Instructor: Action
+
+Tell the student to do the following themselves — **DO NOT create or edit CLAUDE.md for them**:
+
+1. **Navigate to their repository** (if not already there)
+2. **Run `/init`** to auto-generate a CLAUDE.md
+3. **Review** the generated file — read through it and see what Claude detected
+4. **Enhance it** by adding or improving these sections:
+   - Project overview (2-3 sentences describing the project)
+   - Tech stack (language, framework, testing, build tools)
+   - Conventions (naming, file organization, code style)
+   - Common commands (test, build, dev server, lint)
+5. **Remove any placeholder text** (TODO, FIXME, unfilled `[brackets]`)
+
+Say: "Go ahead and run `/init` in your repository now. Review what it generates, then enhance it with your project's specifics. Run `/cc-course:continue` when you're done."
+
+**Wait for the student to run `/cc-course:continue` before proceeding.**
+
+### Instructor: Verify
+
+Run ALL these checks in the student's repository before marking complete:
+
+1. **file_exists**: Use Glob to check `CLAUDE.md` exists in the repo root
+2. **file_contains**: Use Grep to check for Overview/Project section, Tech Stack section, and Conventions section
+3. **file_quality**: Use Read to check:
+   - File is under 500 lines (warn at 300)
+   - No remaining `TODO`/`FIXME` placeholders
+   - No unfilled `[bracket]` placeholders
+   - Has at least 4 meaningful sections
+
+**On failure**: Tell the student specifically what's missing (e.g., "Your CLAUDE.md is missing a Tech Stack section"). Wait for `/cc-course:continue`, then re-verify.
+
+**On success**: Update progress.json tasks: `create_claude_md`, `add_project_overview`, `add_tech_stack`, `add_conventions`, `claude_md_quality`.
+
 ### Checklist
 
 - [ ] Run `/init` in your repository
@@ -324,6 +408,36 @@ verification:
   task_key: test_claude_understanding
 ```
 
+### Instructor: Checkpoint
+
+Ask the student using AskUserQuestion:
+- **Question**: "Ready to test your CLAUDE.md by asking me questions about your project? This will show whether the file is working well."
+- **Options**: "Yes, let's test it" / "I want to tweak my CLAUDE.md first"
+- On "tweak first": let them make changes, wait for `/cc-course:continue`
+
+### Instructor: Action
+
+Tell the student:
+"Now ask me questions about YOUR project to verify CLAUDE.md is working. Try these:
+1. 'What is this project about?'
+2. 'What testing framework do we use?'
+3. 'Where would I add a new [component/endpoint/test]?'
+4. 'What are the naming conventions?'
+
+Ask at least 2-3 of these. If my answers are wrong or vague, that means your CLAUDE.md needs improvement — go back and enhance it."
+
+**Answer the student's questions based on what you can read from their CLAUDE.md.** If your answers are inaccurate, help them identify what to add to CLAUDE.md.
+
+After a few rounds of Q&A, ask: "Are you satisfied with how well I understand your project? Run `/cc-course:continue` when ready."
+
+### Instructor: Verify
+
+Use AskUserQuestion:
+- **Question**: "Did Claude answer your project questions accurately based on your CLAUDE.md?"
+- **Options**: "Yes, it worked well" / "I improved my CLAUDE.md and it's better now" / "Still needs work"
+- On "still needs work": guide them to add more specific info, then re-verify
+- On success: update progress.json task `test_claude_understanding`
+
 ### Checklist
 
 - [ ] Asked Claude "What is this project about?" - got accurate answer
@@ -353,7 +467,6 @@ verification:
 
 | Command | Purpose |
 |---------|---------|
-| `/cost` | Show token usage and spending |
 | `/model` | Switch models mid-session |
 | `/config` | View/modify settings |
 
@@ -381,7 +494,6 @@ Run these commands and observe the output:
 1. `/help` - See all commands
 2. `/doctor` - Check installation health
 3. `/config` - View your settings
-4. `/cost` - Check token usage
 
 ### Verification
 
@@ -392,7 +504,7 @@ verification:
   questions:
     - "Run /help and identify 5 useful commands"
     - "Run /doctor and confirm no issues"
-    - "Run /cost to see token usage"
+    - "Run /config to view your settings"
   task_key: explore_slash_commands
 ```
 
@@ -401,8 +513,34 @@ verification:
 - [ ] Used `/help` to see available commands
 - [ ] Used `/doctor` to verify installation
 - [ ] Used `/config` to see current settings
-- [ ] Used `/cost` to see token usage
 - [ ] Know the difference between `/clear` and `/compact`
+
+### Instructor: Checkpoint
+
+Ask the student using AskUserQuestion:
+- **Question**: "Do you understand the main slash commands? (`/help`, `/doctor`, `/config`, `/clear`, `/compact`, `/model`)"
+- **Options**: "Yes, I understand them" / "Can you explain the difference between /clear and /compact?"
+- On "/clear vs /compact": explain that `/clear` resets the conversation completely while `/compact` compresses context to free up space without losing it entirely
+
+### Instructor: Action
+
+Tell the student:
+"Now try these commands yourself in this session:
+1. Run `/help` — scan through the available commands
+2. Run `/doctor` — check that everything is healthy
+3. Run `/config` — look at your current settings
+
+Try them now and run `/cc-course:continue` when you've explored them."
+
+**Wait for the student to run `/cc-course:continue`.**
+
+### Instructor: Verify
+
+Try to verify using MCP session search:
+1. Use `mcp__cclogviewer__search_logs` or `mcp__cclogviewer__get_session_timeline` to check if the student ran `/help`, `/doctor`, and `/config` in this session
+2. **Fallback** (if MCP is unavailable or returns no results): Use AskUserQuestion to confirm: "Did you try /help, /doctor, and /config?"
+
+On success: update progress.json task `explore_slash_commands`
 
 ---
 
@@ -458,6 +596,25 @@ verification:
     - "What is the difference between -c and -r flags?"
   task_key: test_session_commands
 ```
+
+### Instructor: Action
+
+Tell the student:
+"Let's try the session management commands:
+1. Run `/context` — see what files and context are currently loaded in this session
+2. Run `/export` — export this conversation (useful for saving your learning progress)
+
+Try them now and run `/cc-course:continue` when done."
+
+**Wait for the student to run `/cc-course:continue`.**
+
+### Instructor: Verify
+
+Try to verify using MCP session search:
+1. Use `mcp__cclogviewer__search_logs` or `mcp__cclogviewer__get_session_timeline` to check if the student ran `/context` in this session
+2. **Fallback**: Use AskUserQuestion to confirm: "Did you try `/context` and `/export`?"
+
+On success: update progress.json task `test_session_commands`
 
 ### Additional Checklist
 
@@ -524,6 +681,34 @@ verification:
     - "Identify if Claude understood your codebase from the plan"
   task_key: use_plan_mode
 ```
+
+### Instructor: Checkpoint
+
+Ask the student using AskUserQuestion:
+- **Question**: "Do you understand when to use plan mode vs just asking Claude directly? (Plan mode is best for complex, multi-file changes where you want to review the approach first.)"
+- **Options**: "Yes, I understand when to use it" / "Can you give examples?"
+- On "give examples": walk through the table of when to use vs skip plan mode
+
+### Instructor: Action
+
+Tell the student:
+"Let's try plan mode now:
+1. Press `Shift+Tab` to toggle plan mode ON (you'll see an indicator)
+2. Ask Claude to plan something for your project — e.g., 'Plan how to add [a feature relevant to your codebase]'
+3. Review the plan Claude generates — notice it explains the approach without executing
+4. You can provide feedback on the plan or just observe
+
+Try it now. When you've seen a plan generated, run `/cc-course:continue`."
+
+**Wait for the student to run `/cc-course:continue`.**
+
+### Instructor: Verify
+
+Try to verify using MCP session search:
+1. Use `mcp__cclogviewer__search_logs` or `mcp__cclogviewer__get_session_timeline` to check for plan mode activity in this session
+2. **Fallback**: Use AskUserQuestion: "Did you enter plan mode and see a plan generated?"
+
+On success: update progress.json task `use_plan_mode`
 
 ### Checklist
 
@@ -645,6 +830,56 @@ verification:
       task_key: valid_command_format
 ```
 
+### Instructor: Checkpoint
+
+Ask the student using AskUserQuestion:
+- **Question**: "Do you understand the structure of a custom command? (A markdown file in `.claude/commands/` with frontmatter containing `name` and `description`.)"
+- **Options**: "Yes, I understand" / "Can you show the structure again?"
+- On "show again": re-present the command file structure from the Content section
+
+### Instructor: Action
+
+Tell the student — **DO NOT create the command for them**:
+
+"Now create your own custom command! Here are ideas based on your role:
+
+| Role | Command Idea |
+|------|--------------|
+| Frontend | `/new-component` — Create component with styles and tests |
+| Backend | `/new-endpoint` — Create API endpoint with validation |
+| QA | `/test-suite` — Generate test suite for a module |
+| DevOps | `/new-service` — Scaffold service configuration |
+| Data | `/new-pipeline` — Create data pipeline template |
+
+Steps:
+1. Create the directory: `mkdir -p .claude/commands`
+2. Create a markdown file: `.claude/commands/[your-command].md`
+3. Add frontmatter with `name` and `description`
+4. Add instructions for what Claude should do when the command is invoked
+
+Create your command now and run `/cc-course:continue` when done."
+
+**Wait for the student to run `/cc-course:continue`.**
+
+### Instructor: Verify
+
+Run these checks in the student's repository:
+
+1. **directory_exists**: Use Glob to check `.claude/commands/` directory exists
+2. **file_pattern**: Use Glob for `.claude/commands/*.md` — at least 1 file must exist
+3. **frontmatter_check**: Use Read to verify the command file has frontmatter with `name:` and `description:`
+
+**On failure**: Tell the student specifically what's missing:
+- No directory? → "Run `mkdir -p .claude/commands` first"
+- No files? → "Create a markdown file in `.claude/commands/`"
+- No frontmatter? → "Add `---` delimiters with `name:` and `description:` at the top"
+
+Give the student a brief review of their command — what's good, what could be improved.
+
+Wait for `/cc-course:continue` after fixes, then re-verify.
+
+**On success**: Update progress.json tasks: `create_commands_directory`, `create_custom_command`, `valid_command_format`
+
 ### Checklist
 
 - [ ] Created `.claude/commands/` directory
@@ -700,6 +935,38 @@ verification:
     - git_committed: ".claude/commands"
       task_key: commit_commands
 ```
+
+### Instructor: Action
+
+Tell the student:
+"Great work! Let's commit everything you've created in this seminar:
+
+1. Stage your files:
+   ```bash
+   git add CLAUDE.md .claude/
+   ```
+2. Commit with a descriptive message:
+   ```bash
+   git commit -m \"Add Claude Code configuration
+
+   - Add CLAUDE.md with project context
+   - Add custom command for [your workflow]\"
+   ```
+
+Run these commands now and run `/cc-course:continue` when done."
+
+**Wait for the student to run `/cc-course:continue`.**
+
+### Instructor: Verify
+
+Run these checks:
+1. Use Bash (read-only) to run `git log --oneline -5` in the student's repository
+2. Check that the latest commit includes CLAUDE.md and `.claude/commands`
+3. Alternatively, run `git diff --cached --name-only` or `git show --name-only HEAD` to verify committed files
+
+**On failure**: Tell the student what's not committed yet. Wait for `/cc-course:continue`, then re-verify.
+
+**On success**: Update progress.json tasks: `commit_claude_md`, `commit_commands`
 
 ### Checklist
 

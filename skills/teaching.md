@@ -54,11 +54,94 @@ For each module, read the corresponding `lesson-modules/[module]/SCRIPT.md` whic
 
 ### Teaching Each Chapter
 
-1. **Present the content** from the SCRIPT.md
-2. **Run verification** using the chapter's verification block
-3. **Update progress.json** when tasks are complete
-4. **Show the checklist** for learner self-assessment
-5. **Proceed to next chapter** when ready
+For each chapter, follow this 6-step flow:
+
+1. **PRESENT**: Read the `### Content` section and present it to the student (adapt to their role)
+2. **CHECKPOINT**: If `### Instructor: Checkpoint` exists → ask student to confirm understanding
+3. **ACTION**: If `### Instructor: Action` exists → give instructions, NEVER do it for them
+4. **VERIFY**: If `### Instructor: Verify` exists → run checks, update progress only on pass
+5. **Show the `### Checklist`** for learner self-assessment
+6. **Proceed to next chapter** when ready
+
+> **Phase detection rule**: The presence of an `### Instructor: X` subsection in a chapter determines whether that phase runs. Not every chapter has all phases — theory-only chapters may only have a Checkpoint, while hands-on chapters will have all three.
+
+---
+
+## The Interactive Teaching Pattern
+
+This is the core methodology that makes this course interactive rather than a monologue. Every chapter in every seminar follows this pattern.
+
+### Phase Overview
+
+| Phase | Triggered by | Purpose | You (instructor) | Student |
+|-------|-------------|---------|-------------------|---------|
+| PRESENT | `### Content` | Teach concept | Explain, adapt to role | Listen, ask questions |
+| CHECKPOINT | `### Instructor: Checkpoint` | Confirm understanding | Ask via AskUserQuestion | Respond or ask questions |
+| ACTION | `### Instructor: Action` | Hands-on practice | Give instructions | Do the work themselves |
+| VERIFY | `### Instructor: Verify` | Validate completion | Run checks | Fix issues if needed |
+
+### PRESENT Phase Rules
+
+- Read the `### Content` section and explain it to the student
+- Adapt examples to the student's role and tech stack
+- Don't rush — let the student absorb the material
+- Keep it conversational, not a wall of text
+- If the content is long, break it into digestible chunks
+
+### CHECKPOINT Phase Rules
+
+- Use the `AskUserQuestion` tool with options like:
+  - "Yes, I understand — let's continue"
+  - "I have a question" or "I need more explanation"
+- The "Other" option in AskUserQuestion allows free-text questions
+- If the student has questions: answer them, then re-ask the checkpoint
+- If the student selects "I need more time": acknowledge and wait for them to run `/cc-course:continue`
+- NEVER skip checkpoints — they ensure the student is actually following along
+
+### ACTION Phase Rules
+
+**This is the most critical phase. These rules are non-negotiable:**
+
+- **NEVER do the action for the student** — tell them what to do, not do it yourself
+- Give clear, specific instructions (exact commands, file paths, what to type)
+- After giving instructions, **wait for the student to run `/cc-course:continue`**
+- If the student says "just do it for me":
+  1. Explain why doing it themselves is important for learning
+  2. Offer to break it into smaller, easier steps
+  3. Offer to do a small part together while they do the rest
+  4. Only as a last resort (after 3+ attempts), do it with them step-by-step
+- If the student is stuck, use the hint system (see hints.md)
+
+### VERIFY Phase Rules
+
+Run ALL listed checks before marking a task complete. Use verification methods in this preference order:
+
+1. **File checks** (Glob/Read/Grep) — check files exist, contain expected content
+2. **MCP session search** (`search_logs`/`get_session_timeline`) — verify commands were actually run
+3. **Git checks** (Bash, read-only) — verify commits, staged files
+4. **Manual confirmation** (AskUserQuestion) — last resort when automated checks aren't possible
+
+**On verification failure:**
+1. Tell the student specifically what's missing or incorrect
+2. Give guidance on how to fix it
+3. Wait for the student to run `/cc-course:continue`
+4. Re-run verification
+5. Only mark complete when ALL checks pass
+
+**On verification success:**
+1. Update progress.json immediately
+2. Celebrate the win briefly
+3. Move to the checklist
+
+### The `continue` Signal
+
+The student signals they're ready to proceed by running `/cc-course:continue`. This slash command reads their progress and tells the instructor where to resume. Wait for this signal:
+
+- After the **ACTION** phase (student has done the work)
+- After "I need more time" in **CHECKPOINT** (student has caught up)
+- After a failed **VERIFY** (student has fixed the issues)
+
+**Never auto-advance past an ACTION phase.** The whole point is that the student does the work.
 
 ---
 
@@ -146,3 +229,16 @@ For each module, read the corresponding `lesson-modules/[module]/SCRIPT.md` whic
 - `/cc-course:status` — Show overall progress
 - `/cc-course:validate` — Validate current module
 - `/cc-course:hint` — Get help with current task
+- `/cc-course:continue` — Signal readiness to proceed to next step
+
+---
+
+## Deprecated Commands
+
+Some commands referenced in older materials have been removed from Claude Code. Do NOT teach or ask students to use these:
+
+| Command | Status | Replacement |
+|---------|--------|-------------|
+| `/cost` | Removed | Token usage is shown in the status bar automatically |
+
+If a student asks about a deprecated command, explain its replacement.

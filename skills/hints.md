@@ -55,7 +55,7 @@ Track hint level in progress.json under current task.
 
 #### explore_slash_commands
 - **L1**: "Just type `/help` to see all available commands."
-- **L2**: "Try these five: /help, /doctor, /config, /cost, /clear"
+- **L2**: "Try these four: /help, /doctor, /config, /clear"
 - **L3**: "Start a Claude session (`claude`) and type `/` to see autocomplete options."
 
 #### use_plan_mode
@@ -66,7 +66,7 @@ Track hint level in progress.json under current task.
 #### create_cheat_sheet
 - **L1**: "Add a '## My Claude Code Cheat Sheet' section to your CLAUDE.md"
 - **L2**: "List 5 commands you found useful and 3 flags you'll use regularly."
-- **L3**: "Template: '### Commands I Use Daily\n- /clear — reset context\n- /cost — check usage'"
+- **L3**: "Template: '### Commands I Use Daily\n- /clear — reset context\n- /compact — compress conversation'"
 
 ---
 
