@@ -16,23 +16,17 @@ This is a Claude Code plugin that provides a 5-module interactive course teachin
 
 ```bash
 claude plugin install github:SeleznovIvan/claude-code-course-plugin
-
-# Initialize the bundled MCP server's submodule
-cd ~/.claude/plugins/cc-course
-git submodule update --init --recursive
 ```
 
 ### Manual Installation
 
 ```bash
-# Clone to your plugins directory
-git clone --recurse-submodules https://github.com/SeleznovIvan/claude-code-course-plugin.git ~/.claude/plugins/cc-course
+git clone https://github.com/SeleznovIvan/claude-code-course-plugin.git ~/.claude/plugins/cc-course
 ```
 
 ### Development Mode
 
 ```bash
-# Run Claude Code with this plugin
 claude --plugin-dir /path/to/cc-course
 ```
 
@@ -47,6 +41,7 @@ claude --plugin-dir /path/to/cc-course
 ## Quick Start
 
 ```
+/cc-course:setup      # Install MCP server (one-time setup)
 /cc-course:start 1    # Begin with Foundations & Commands
 /cc-course:status     # Check your progress
 /cc-course:validate   # Verify current module completion

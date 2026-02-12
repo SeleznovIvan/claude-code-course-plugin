@@ -1,9 +1,7 @@
 {
   "mcpServers": {
     "cclogviewer": {
-      "command": "npx",
-      "args": ["tsx", "${CLAUDE_PLUGIN_ROOT}/mcp/cclogviewer/src/index.ts"],
-      "env": {}
+      "command": "cclogviewer-mcp"
     }
   }
 }

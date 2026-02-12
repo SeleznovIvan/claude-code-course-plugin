@@ -16,36 +16,73 @@ This is a Claude Code plugin that provides a 5-module interactive course teachin
 ### Option 1: Plugin Install (Recommended)
 
 ```bash
-# Install the plugin
 claude plugin install github:SeleznovIvan/claude-code-course-plugin
-
-# Initialize the bundled MCP server
-cd ~/.claude/plugins/cc-course
-git submodule update --init --recursive
 ```
 
 ### Option 2: Manual Installation
 
 ```bash
-# Clone with submodules to your plugins directory
-git clone --recurse-submodules https://github.com/SeleznovIvan/claude-code-course-plugin.git ~/.claude/plugins/cc-course
+git clone https://github.com/SeleznovIvan/claude-code-course-plugin.git ~/.claude/plugins/cc-course
 ```
 
 ### Option 3: Development Mode
 
 ```bash
-# Clone the repository
-git clone --recurse-submodules https://github.com/SeleznovIvan/claude-code-course-plugin.git
-
-# Run Claude Code with the plugin
+git clone https://github.com/SeleznovIvan/claude-code-course-plugin.git
 claude --plugin-dir ./claude-code-course-plugin
 ```
 
-## Quick Start
+## Post-Installation Setup
 
-Once installed, start Claude Code and run:
+After installing the plugin, run the setup command to install the required MCP server:
 
 ```
+/cc-course:setup
+```
+
+This will automatically download and install the `cclogviewer-mcp` binary needed for session tracking.
+
+### Manual MCP Installation
+
+If the automatic setup fails, you can install manually:
+
+```bash
+# Option 1: Download pre-built binary (no Go required)
+curl -L https://github.com/SeleznovIvan/cclogviewer/releases/latest/download/cclogviewer-mcp-darwin-arm64 -o ~/.local/bin/cclogviewer-mcp
+chmod +x ~/.local/bin/cclogviewer-mcp
+
+# Option 2: Install via Go (requires Go 1.21+)
+go install github.com/SeleznovIvan/cclogviewer/cmd/cclogviewer-mcp@latest
+
+# Then add to Claude Code
+claude mcp add cclogviewer cclogviewer-mcp
+```
+
+Available binaries:
+- `cclogviewer-mcp-darwin-arm64` (Mac Apple Silicon)
+- `cclogviewer-mcp-darwin-amd64` (Mac Intel)
+- `cclogviewer-mcp-linux-amd64` (Linux x64)
+- `cclogviewer-mcp-linux-arm64` (Linux ARM)
+- `cclogviewer-mcp-windows-amd64.exe` (Windows)
+
+See all releases: https://github.com/SeleznovIvan/cclogviewer/releases
+
+## Getting Started
+
+Complete these steps to start the course:
+
+```bash
+# 1. Install the plugin
+claude plugin install github:SeleznovIvan/claude-code-course-plugin
+
+# 2. Start Claude Code in your project directory
+cd /path/to/your/repo
+claude
+
+# 3. Install the MCP server (one-time setup)
+/cc-course:setup
+
+# 4. Start the course!
 /cc-course:start 1
 ```
 
@@ -55,6 +92,7 @@ That's it! Claude will guide you from there.
 
 | Command | Description |
 |---------|-------------|
+| `/cc-course:setup` | Install the required MCP server (run once after installation) |
 | `/cc-course:start 1` to `/cc-course:start 5` | Begin a specific module |
 | `/cc-course:status` | See your progress |
 | `/cc-course:validate` | Check if current module is complete |
@@ -146,19 +184,19 @@ The plugin is configured via `.claude-plugin/plugin.json`:
 
 ### MCP Configuration
 
-The bundled cclogviewer MCP is configured via `.mcp.json`:
+The cclogviewer MCP is configured via `.mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "cclogviewer": {
-      "command": "npx",
-      "args": ["tsx", "${CLAUDE_PLUGIN_ROOT}/mcp/cclogviewer/src/index.ts"],
-      "env": {}
+      "command": "cclogviewer-mcp"
     }
   }
 }
 ```
+
+**Note:** The `cclogviewer-mcp` binary must be installed and in your PATH. Run `/cc-course:setup` to install it automatically.
 
 ## Troubleshooting
 
@@ -177,20 +215,40 @@ The bundled cclogviewer MCP is configured via `.mcp.json`:
 
 ### MCP server not starting
 
-1. Ensure submodules are initialized:
+1. Run the setup command:
+   ```
+   /cc-course:setup
+   ```
+
+2. Or install manually:
    ```bash
+   # Download pre-built binary
+   curl -L https://github.com/SeleznovIvan/cclogviewer/releases/latest/download/cclogviewer-mcp-darwin-arm64 -o ~/.local/bin/cclogviewer-mcp
+   chmod +x ~/.local/bin/cclogviewer-mcp
+
+   # Add to Claude Code
+   claude mcp add cclogviewer cclogviewer-mcp
+   ```
+
+3. Verify the binary works:
+   ```bash
+   which cclogviewer-mcp
+   echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | cclogviewer-mcp
+   ```
+
+4. Check MCP is configured in Claude:
+   ```bash
+   claude mcp list
+   ```
+
+5. **Advanced fallback** (if download and go install both fail):
+   ```bash
+   # Initialize submodule and build from source (requires Go 1.21+)
    cd ~/.claude/plugins/cc-course
    git submodule update --init --recursive
-   ```
-
-2. Verify the cclogviewer source exists:
-   ```bash
-   ls ~/.claude/plugins/cc-course/mcp/cclogviewer/src/index.ts
-   ```
-
-3. Check if `npx tsx` works:
-   ```bash
-   npx tsx --version
+   cd mcp/cclogviewer
+   make build-mcp
+   cp bin/cclogviewer-mcp ~/.local/bin/
    ```
 
 ### Commands not found

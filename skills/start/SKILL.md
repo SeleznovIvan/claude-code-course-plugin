@@ -10,11 +10,42 @@ Start module **$ARGUMENTS** of the Claude Code Developer Course.
 
 ## Before Starting
 
-1. Initialize student data directory (if first start)
-2. Read `progress.json` to check learner state
-3. **Check schema version and run migrations if needed**
-4. Verify prerequisites (previous modules completed)
-5. Record session start via cclogviewer MCP
+1. **Check MCP availability** (cclogviewer-mcp must be installed)
+2. Initialize student data directory (if first start)
+3. Read `progress.json` to check learner state
+4. **Check schema version and run migrations if needed**
+5. Verify prerequisites (previous modules completed)
+6. Record session start via cclogviewer MCP
+
+## MCP Availability Check
+
+Before proceeding with any module, verify cclogviewer MCP is available:
+
+```bash
+# Check if binary exists
+command -v cclogviewer-mcp &> /dev/null
+```
+
+If the binary is not found, display this message and stop:
+
+```
+The cclogviewer MCP server is required but not installed.
+
+Run /cc-course:setup to install it automatically.
+
+Or install manually:
+  1. Download from: https://github.com/SeleznovIvan/cclogviewer/releases
+  2. Or with Go 1.21+: go install github.com/SeleznovIvan/cclogviewer/cmd/cclogviewer-mcp@latest
+  3. Add to Claude: claude mcp add cclogviewer cclogviewer-mcp
+```
+
+If the binary exists, test that it responds to JSON-RPC:
+
+```bash
+echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | cclogviewer-mcp 2>/dev/null | head -c 100
+```
+
+If this fails, warn but allow continuing with degraded session tracking.
 
 ## Student Data Directory Initialization
 
