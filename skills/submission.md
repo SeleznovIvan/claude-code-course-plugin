@@ -10,8 +10,9 @@ All student-specific data is stored in the student's repository:
 {student-repo}/.claude/claude-course/
 ├── progress.json                    # Student progress tracking
 ├── sessions/                        # Session exports from MCP
-│   ├── {session-id}-logs.json
-│   └── {session-id}-summary.json
+│   ├── {session-id}.jsonl           # Raw JSONL log file
+│   ├── {session-id}-logs.json       # Processed logs (JSON)
+│   └── {session-id}-summary.json    # Session summary (JSON)
 └── submissions/                     # Homework archives
     └── seminar1-jane-doe-2026-02-10.zip
 ```
@@ -76,11 +77,13 @@ Each submission includes a manifest.json with metadata for instructor review:
     "files": [
       {
         "id": "abc-123",
+        "raw_jsonl": "abc-123.jsonl",
         "logs": "abc-123-logs.json",
         "summary": "abc-123-summary.json"
       },
       {
         "id": "def-456",
+        "raw_jsonl": "def-456.jsonl",
         "logs": "def-456-logs.json",
         "summary": "def-456-summary.json"
       }
@@ -160,8 +163,10 @@ seminar{N}-{name}-{date}.zip
 ├── progress/
 │   └── progress.json          # Current progress snapshot
 └── sessions/
-    ├── {session-id-1}-logs.json
-    ├── {session-id-1}-summary.json
+    ├── {session-id-1}.jsonl           # Raw JSONL log
+    ├── {session-id-1}-logs.json       # Processed logs
+    ├── {session-id-1}-summary.json    # Summary
+    ├── {session-id-2}.jsonl
     ├── {session-id-2}-logs.json
     └── {session-id-2}-summary.json
 ```
@@ -233,27 +238,44 @@ session_ids = [s["session_id"] for s in sessions]
 
 ### MCP Calls for Each Session
 
-For each session ID, call:
+For each session ID, collect three artifacts:
+
+#### Processed logs (JSON)
 
 ```
 mcp__cclogviewer__get_session_logs(
     session_id=session_id,
-    project=student_repo
+    project=student_repo,
+    output_path="sessions/{session-id}-logs.json"
 )
 ```
+
+#### Session summary (JSON)
 
 ```
 mcp__cclogviewer__get_session_summary(
     session_id=session_id,
-    project=student_repo
+    project=student_repo,
+    output_path="sessions/{session-id}-summary.json"
 )
 ```
 
+#### Raw JSONL log file
+
+Find and copy the raw JSONL file from disk:
+
+```bash
+find ~/.claude/projects -name "{session-id}.jsonl" -type f 2>/dev/null
+```
+
+Copy to `sessions/{session-id}.jsonl`. If not found, skip with a warning.
+
 ### Save to Files
 
-Save MCP responses to:
-- `sessions/{session-id}-logs.json`
-- `sessions/{session-id}-summary.json`
+Save to the sessions directory:
+- `sessions/{session-id}.jsonl` — raw JSONL log (full unprocessed session)
+- `sessions/{session-id}-logs.json` — processed logs via MCP
+- `sessions/{session-id}-summary.json` — session summary via MCP
 
 ---
 

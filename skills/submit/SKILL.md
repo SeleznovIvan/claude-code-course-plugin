@@ -79,23 +79,40 @@ Get session IDs from progress.json:
 sessions = progress["modules"][module_key]["sessions"]
 ```
 
-For each session, call MCP:
+For each session, collect **three** artifacts:
+
+#### a) Full processed logs (JSON)
 
 ```
 mcp__cclogviewer__get_session_logs(
     session_id=session["session_id"],
-    project=student_repo
+    project=student_repo,
+    output_path="{staging}/sessions/{session-id}-logs.json"
 )
 ```
+
+#### b) Session summary (JSON)
 
 ```
 mcp__cclogviewer__get_session_summary(
     session_id=session["session_id"],
-    project=student_repo
+    project=student_repo,
+    output_path="{staging}/sessions/{session-id}-summary.json"
 )
 ```
 
-Save responses as JSON files for inclusion in zip.
+#### c) Raw JSONL log file
+
+The raw JSONL file is the unprocessed Claude Code session log. Find and copy it:
+
+```bash
+# Find the raw JSONL file for this session
+find ~/.claude/projects -name "{session-id}.jsonl" -type f 2>/dev/null
+```
+
+Copy the found file to `{staging}/sessions/{session-id}.jsonl`.
+
+If the JSONL file is not found (e.g., logs were rotated), skip with a warning — the processed JSON logs from step (a) are sufficient.
 
 ## Create Manifest
 
@@ -129,8 +146,9 @@ seminar1-jane-doe-2026-02-10.zip
 ├── progress/
 │   └── progress.json
 └── sessions/
-    ├── {session-id}-logs.json
-    └── {session-id}-summary.json
+    ├── {session-id}.jsonl           # Raw JSONL log file
+    ├── {session-id}-logs.json       # Processed logs
+    └── {session-id}-summary.json    # Session summary
 ```
 
 ### Zip Creation

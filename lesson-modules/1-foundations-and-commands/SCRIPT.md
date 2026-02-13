@@ -877,29 +877,33 @@ Ask the student using AskUserQuestion:
 ### Instructor: Action
 
 Tell the student:
-"Let's try plan mode as a **thinking tool** — we'll generate a plan, iterate on it, and then exit **without executing**:
+"Let's try plan mode as a **thinking tool**. I'm about to activate plan mode for this conversation. Here's what will happen:
 
-1. **Enter plan mode**: Press `Shift+Tab` (you'll see a plan mode indicator)
-2. **Request a plan**: Ask Claude to plan a feature for your project — e.g., 'Plan how to add [something relevant to your codebase]'
+1. **I'll enter plan mode** — you'll see a plan mode indicator appear
+2. **You request a plan**: Ask me to plan a feature for your project — e.g., 'Plan how to add [something relevant to your codebase]'
 3. **Iterate on the plan** (2-3 rounds): Give feedback like:
    - 'What about edge cases?'
    - 'Can you split step 3 into smaller parts?'
    - 'What if we used [alternative approach] instead?'
-4. **Exit with Escape**: Press `Escape` to deactivate plan mode **WITHOUT accepting or executing the plan**
+4. **Exit with Escape**: Press `Escape` to exit plan mode **WITHOUT accepting or executing the plan**
 
-The key lesson: plan mode is for **thinking and exploring** approaches. You always control whether anything gets executed. Pressing Escape discards the plan safely.
+The key lesson: plan mode is for **thinking and exploring** approaches. You always control whether anything gets executed.
 
-Try it now. When you've gone through all 4 steps, use the {cc-course:continue} Skill tool."
+Ready? I'll activate plan mode now."
+
+**After delivering this message, immediately invoke the `EnterPlanMode` tool.** Do not wait — call the tool in the same turn as the explanation above.
+
+The student will approve the plan mode activation, then interact with you in plan mode. After they press `Escape` to exit, they should use the {cc-course:continue} Skill tool to resume the lesson.
 
 **Wait for the student to use the {cc-course:continue} Skill tool.**
 
 ### Instructor: Verify
 
 Use AskUserQuestion:
-- **Question**: "Did you complete all 4 steps? (1) Enter plan mode, (2) Generate a plan, (3) Iterate on it with feedback, (4) Exit with Escape without executing"
-- **Options**: "Yes, I did all 4 steps" / "I generated a plan but didn't iterate" / "I need to try again"
-- On "didn't iterate": encourage them to try again with 2-3 rounds of feedback, wait for {cc-course:continue}
-- On "need to try again": wait for {cc-course:continue}, then re-verify
+- **Question**: "How did plan mode go? Did you: (1) Request a plan for a feature, (2) Iterate on it with feedback (2-3 rounds), (3) Exit with Escape without executing?"
+- **Options**: "Yes, completed all steps" / "I got a plan but didn't iterate" / "I need to try again"
+- On "didn't iterate": invoke `EnterPlanMode` again so they can retry with 2-3 rounds of feedback, wait for {cc-course:continue}
+- On "need to try again": invoke `EnterPlanMode` again, wait for {cc-course:continue}, then re-verify
 - On success: update progress.json task `use_plan_mode`
 
 ### Checklist
@@ -922,7 +926,41 @@ Use AskUserQuestion:
 
 #### What Are Custom Commands?
 
-Custom commands are project-specific slash commands you define. They live in `.claude/commands/` and appear when you type `/`.
+Custom commands are project-specific slash commands you define as markdown files. They live in `.claude/commands/` and appear when you type `/`.
+
+Think of them as **saved prompts that encode your team's workflows**. Instead of re-typing the same complex instructions every session, you write them once and invoke with a slash command.
+
+#### Why Custom Commands?
+
+**The problem**: You find yourself giving Claude the same multi-step instructions repeatedly — "review the diff using our style guide", "scaffold a component following our patterns", "run the deploy checklist". Every new session, you re-explain the same context.
+
+**Before custom commands** (every session):
+```
+You: "Review my git diff. Check for: unused imports, console.logs left in,
+     functions over 50 lines, missing error handling. Use our team convention
+     of descriptive variable names. Format the review as a checklist."
+```
+
+**After custom commands** (once, forever):
+```
+You: /review
+```
+
+Same result, zero re-typing. The instructions live in `.claude/commands/review.md` and Claude follows them every time.
+
+#### When to Create a Command
+
+Create a custom command when you notice any of these patterns:
+
+| Signal | Example | Command idea |
+|--------|---------|-------------|
+| **You repeat the same prompt** across sessions | "Scaffold a component with tests" | `/new-component` |
+| **Complex multi-step workflow** you always do the same way | "Run tests, check coverage, format report" | `/test-report` |
+| **Team conventions** that everyone should follow | "Review PR using our style guide checklist" | `/review` |
+| **Onboarding knowledge** that's hard to remember | "Set up local dev environment" | `/setup-local` |
+| **Domain-specific tasks** with many details | "Generate API endpoint with auth, validation, and OpenAPI spec" | `/new-endpoint` |
+
+**Don't create a command** for one-off tasks or things that vary too much between uses.
 
 #### Command File Structure
 
@@ -934,9 +972,7 @@ name: command-name
 description: What this command does (shown in /help)
 ---
 
-# Command: [Name]
-
-## Instructions
+# Instructions
 
 When this command is invoked:
 
@@ -944,52 +980,39 @@ When this command is invoked:
 2. [Second step]
 3. [Third step]
 
-## Context
+# Context
 
-[Any additional context or constraints]
+[Any constraints, conventions, or project-specific details]
 
-## Output Format
+# Output Format
 
 [How Claude should present results]
 ```
 
-#### Example: Create a "New Feature" Command
+The frontmatter (`name` and `description`) is required — it's how Claude Code registers the command.
 
-Create `.claude/commands/new-feature.md`:
+#### Example: A Review Command
 
+`.claude/commands/review.md`:
 ```markdown
 ---
-name: new-feature
-description: Scaffold a new feature with tests and documentation
+name: review
+description: Review current changes against team standards
 ---
 
-# Command: New Feature
+# Instructions
 
-## Instructions
-
-When invoked with a feature name:
-
-1. Create the main implementation file in the appropriate directory
-2. Create a corresponding test file
-3. Update any index/barrel files
-4. Add a brief documentation entry
-
-## Naming Convention
-
-- Feature file: `src/features/[name].ts`
-- Test file: `src/features/__tests__/[name].test.ts`
-
-## After Creation
-
-Show a summary of files created and next steps.
+1. Run `git diff` to see current changes
+2. Check each changed file for:
+   - Unused imports or variables
+   - Console.log / debug statements left in
+   - Functions longer than 50 lines
+   - Missing error handling for async operations
+3. Verify naming follows project conventions (see CLAUDE.md)
+4. Output a checklist: one item per issue found, grouped by file
 ```
 
-#### Using Your Command
-
-```bash
-claude
-/new-feature user-profile
-```
+Usage: just type `/review` — Claude reads the diff and runs the checklist every time.
 
 ### Practice Exercise
 
@@ -1177,6 +1200,30 @@ Run these checks:
 - [ ] CLAUDE.md committed to git
 - [ ] `.claude/commands/` committed to git
 - [ ] Commit message is descriptive
+
+---
+
+## Module Completion
+
+### Instructor: Final Validation
+
+After Chapter 9 is complete, tell the student:
+
+"You've finished all the chapters! Let's validate your work and package it for submission.
+
+**Step 1 — Validate**: Run the {cc-course:validate} Skill tool now. This checks that all required files exist, your CLAUDE.md meets quality standards, and your work is committed."
+
+**Wait for the student to run validate.** If validation fails, help them fix issues and re-run.
+
+**After validation passes**, tell the student:
+
+"All checks passed!
+
+**Step 2 — Submit**: Run the {cc-course:submit} Skill tool to package your work into a submission archive. This bundles your CLAUDE.md, custom commands, progress data, and session logs for instructor review."
+
+**Wait for the student to run submit.**
+
+After submission completes (or if the student declines), proceed to the Seminar Summary below.
 
 ---
 
