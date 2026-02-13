@@ -9,12 +9,9 @@ Run validation checks for the current module.
 
 ## Progress File Location
 
-Read progress from the student's repository:
-```
-{student-repo}/.claude/claude-course/progress.json
-```
+Find and read progress using the **Progress Discovery** algorithm from [progress-tracking.md](../progress-tracking.md#progress-discovery).
 
-NOT from the plugin template.
+**NEVER read from the plugin's template** `progress.json` — always discover the student's copy.
 
 ## Determine Module
 

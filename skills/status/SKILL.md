@@ -9,10 +9,9 @@ Display the learner's progress through the Claude Code Developer Course.
 
 ## Data Source
 
-Read progress from the student's repository:
-```
-{student-repo}/.claude/claude-course/progress.json
-```
+Find and read progress using the **Progress Discovery** algorithm from [progress-tracking.md](../progress-tracking.md#progress-discovery).
+
+**NEVER read from the plugin's template** `progress.json` — always discover the student's copy.
 
 ## Display Format
 

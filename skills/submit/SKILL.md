@@ -10,7 +10,7 @@ Package your completed module work into a submission archive for instructor revi
 
 ## Before Submitting
 
-1. Read progress.json from `{student-repo}/.claude/claude-course/progress.json`
+1. **Find progress.json** using the Progress Discovery algorithm from [progress-tracking.md](../progress-tracking.md#progress-discovery)
 2. Verify the module has been completed (all tasks passed)
 3. If not completed, prompt to run validation first
 

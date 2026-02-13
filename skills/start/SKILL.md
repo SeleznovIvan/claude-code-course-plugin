@@ -54,8 +54,16 @@ On first `/cc-course:start`, create the student data directory structure:
 
 ### Check if First Start
 
+#### Detect Student Repository
+
+Follow the **Progress Discovery** algorithm from [progress-tracking.md](../progress-tracking.md#progress-discovery):
+
+1. Check cwd for `.claude/claude-course/progress.json`
+2. Check git root for `.claude/claude-course/progress.json`
+3. If neither exists (first time), use cwd as `student_repo` (or git root if in a subdirectory)
+4. If not in a git repo, ask the user for their repository path
+
 ```python
-student_repo = detect_student_repo()  # from cwd or ask user
 course_data_dir = f"{student_repo}/.claude/claude-course"
 
 if not os.path.exists(course_data_dir):

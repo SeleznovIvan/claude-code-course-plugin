@@ -16,10 +16,51 @@ All student-specific data is stored in the student's repository:
     └── seminar1-jane-doe-2026-02-10.zip
 ```
 
+### Progress Discovery
+
+When any skill needs to find the student's progress.json, use this algorithm.
+**This works after `/clear`** because the working directory persists even when conversation history is wiped.
+
+#### Step 1: Check working directory
+
+Use Glob to look for `.claude/claude-course/progress.json` relative to the current working directory.
+
+```bash
+# Check cwd
+Glob: .claude/claude-course/progress.json
+```
+
+If found → use it. Set `student_repo = cwd`.
+
+#### Step 2: Check git root
+
+If cwd check fails (e.g., student is in a subdirectory):
+
+```bash
+git rev-parse --show-toplevel
+# Then check {git-root}/.claude/claude-course/progress.json
+```
+
+If found → use it. Set `student_repo = git root`.
+
+#### Step 3: Ask the user
+
+If both checks fail, ask the student using AskUserQuestion:
+- **Question**: "I can't find your course progress. What's the path to your project repository?"
+- Let the student provide the path, then check `{path}/.claude/claude-course/progress.json`
+
+#### Important
+
+- **NEVER fall back to the plugin's own `progress.json`** — that is a blank template
+- The plugin folder (`~/.claude/plugins/cc-course/progress.json`) must NEVER be used as the student's progress file
+- After discovery, set `student_repo` from the `progress["student"]["repository"]` field for all subsequent path resolution
+
 ### Path Resolution
 
+After running Progress Discovery above:
+
 ```python
-student_repo = progress["student"]["repository"]
+student_repo = progress["student"]["repository"]  # from discovered progress.json
 course_data_dir = f"{student_repo}/.claude/claude-course"
 progress_path = f"{course_data_dir}/progress.json"
 sessions_dir = f"{course_data_dir}/sessions"

@@ -10,7 +10,7 @@ Provide a hint for the learner's current task.
 
 ## Determine Context
 
-1. Read progress from `{student-repo}/.claude/claude-course/progress.json`
+1. **Find progress.json** using the Progress Discovery algorithm from [progress-tracking.md](../progress-tracking.md#progress-discovery)
 2. Find `current_module` and `current_task`
 3. If no active task, guide learner to start a module
 

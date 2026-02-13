@@ -9,8 +9,9 @@ The student is signaling they are ready to proceed to the next phase.
 
 ## Instructions
 
-1. Read `progress.json` from the student's data directory
-2. Extract `current_module` and `current_task`
+1. **Find progress.json** using the Progress Discovery algorithm from [progress-tracking.md](../progress-tracking.md#progress-discovery)
+2. Read `progress.json`
+3. Extract `current_module` and `current_task`
 3. If found, output: **Continuing — Module: [current_module], Task: [current_task]**
 4. If `progress.json` is missing or fields are empty, output: **Ready to continue.**
 
