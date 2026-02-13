@@ -10,7 +10,15 @@ Provide a hint for the learner's current task.
 
 ## Determine Context
 
-1. **Find progress.json** using the Progress Discovery algorithm from [progress-tracking.md](../progress-tracking.md#progress-discovery)
+> **PROGRESS DISCOVERY** (works after `/clear`):
+>
+> 1. `Read` the file `{cwd}/.claude/claude-course/progress.json` where `{cwd}` is your current working directory — this is the student's project repo
+> 2. If not found, run `Bash: git rev-parse --show-toplevel` to get the git root, then `Read` `{git-root}/.claude/claude-course/progress.json`
+> 3. If neither exists, ask the user for their repository path
+>
+> **NEVER** read a `progress.json` from any path containing `plugins/` or `cache/` — those are blank templates, not student data.
+
+1. Find and read `progress.json` using the discovery block above
 2. Find `current_module` and `current_task`
 3. If no active task, guide learner to start a module
 

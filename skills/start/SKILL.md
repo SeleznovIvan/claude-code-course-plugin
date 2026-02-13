@@ -56,12 +56,14 @@ On first `/cc-course:start`, create the student data directory structure:
 
 #### Detect Student Repository
 
-Follow the **Progress Discovery** algorithm from [progress-tracking.md](../progress-tracking.md#progress-discovery):
-
-1. Check cwd for `.claude/claude-course/progress.json`
-2. Check git root for `.claude/claude-course/progress.json`
-3. If neither exists (first time), use cwd as `student_repo` (or git root if in a subdirectory)
-4. If not in a git repo, ask the user for their repository path
+> **PROGRESS DISCOVERY** (works after `/clear`):
+>
+> 1. `Read` the file `{cwd}/.claude/claude-course/progress.json` where `{cwd}` is your current working directory — this is the student's project repo
+> 2. If not found, run `Bash: git rev-parse --show-toplevel` to get the git root, then `Read` `{git-root}/.claude/claude-course/progress.json`
+> 3. If neither exists (first time), use cwd as `student_repo` (or git root if in a subdirectory)
+> 4. If not in a git repo, ask the user for their repository path
+>
+> **NEVER** read a `progress.json` from any path containing `plugins/` or `cache/` — those are blank templates, not student data.
 
 ```python
 course_data_dir = f"{student_repo}/.claude/claude-course"

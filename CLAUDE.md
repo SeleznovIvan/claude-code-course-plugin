@@ -90,6 +90,16 @@ When teaching this course:
 6. **Update progress.json** after each completed task — mark tasks as `true`, update module status, and unlock next module when complete
 7. **Reference lesson-modules/** for detailed teaching scripts — each chapter has verification criteria and checklists
 
+### Progress File Discovery
+
+The student's `progress.json` lives at `{student-repo}/.claude/claude-course/progress.json`. To find it:
+
+1. Read `{cwd}/.claude/claude-course/progress.json` (cwd persists after `/clear`)
+2. If not found, check `{git-root}/.claude/claude-course/progress.json`
+3. If neither exists, ask the user
+
+**NEVER** read a `progress.json` from any path containing `plugins/` or `cache/` — those are blank templates, not student data.
+
 ### State Management
 
 The `progress.json` file tracks:
