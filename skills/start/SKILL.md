@@ -1,6 +1,6 @@
 ---
 name: cc-course:start
-description: Start a Claude Code course module. Usage: /cc-course:start 1 (modules 1-5)
+description: "Start a Claude Code course module. Usage: /cc-course:start 1 (modules 1-5)"
 argument-hint: "[module-number 1-5]"
 ---
 
@@ -15,7 +15,8 @@ Start module **$ARGUMENTS** of the Claude Code Developer Course.
 3. Read `progress.json` to check learner state
 4. **Check schema version and run migrations if needed**
 5. Verify prerequisites (previous modules completed)
-6. Record session start via cclogviewer MCP
+6. **Read [teaching.md](../teaching.md)** for instructor persona and teaching methodology
+7. Record session start via cclogviewer MCP
 
 ## MCP Availability Check
 

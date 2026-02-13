@@ -45,8 +45,10 @@ Quick reference showing which interactive phases each chapter has:
 | 3 — CLI Basics | yes | yes | yes | yes |
 | 4 — CLAUDE.md | yes | yes | yes | yes |
 | 5 — Testing Setup | yes | yes | yes | yes |
-| 6 — Slash Commands | yes | yes | yes | yes |
-| 6b — Session Management | yes | — | yes | yes |
+| 6a — Discovery Commands | yes | yes | yes | yes |
+| 6b — Understanding Context | yes | — | yes | yes |
+| 6c — Context Management | yes | yes | yes | yes |
+| 6d — Status Line | yes | — | yes | yes |
 | 7 — Plan Mode | yes | yes | yes | yes |
 | 8 — Custom Commands | yes | yes | yes | yes |
 | 9 — Commit | yes | — | yes | yes |
@@ -550,90 +552,44 @@ Use AskUserQuestion:
 
 ---
 
-## Chapter 6: Essential Slash Commands
+## Chapter 6a: Discovery Commands
 
-**Chapter ID**: `1.6-slash-commands`
+**Chapter ID**: `1.6a-discovery-commands`
 
-> 📚 **Deep Dive**: See [KNOWLEDGE.md — Chapter 1.6](./KNOWLEDGE.md#chapter-16-essential-slash-commands) for `/clear` vs `/compact` detailed comparison, session management deep dive, and complete CLI flags reference.
+> 📚 **Deep Dive**: See [KNOWLEDGE.md — Chapter 1.6](./KNOWLEDGE.md#chapter-16-essential-slash-commands) for the complete slash commands reference and CLI flags.
 
 ### Content
 
-#### Navigation & Help
+These three commands help you discover what Claude Code can do and diagnose issues.
 
-| Command | Purpose |
-|---------|---------|
-| `/help` | Show all available commands |
-| `/clear` | Reset conversation context |
-| `/compact` | Compress context (when running low) |
+#### `/help` — See All Commands
 
-#### Session Management
+Shows every available slash command, including custom commands you create. This is your go-to when you forget a command name.
 
-| Command | Purpose |
-|---------|---------|
-| `/model` | Switch models mid-session |
-| `/config` | View/modify settings |
+#### `/doctor` — Diagnose Issues
 
-#### Development Commands
+Runs health checks on your Claude Code installation. Use it when something isn't working or after updates.
 
-| Command | Purpose |
-|---------|---------|
-| `/init` | Initialize project (create CLAUDE.md) |
-| `/doctor` | Diagnose installation issues |
-| `/review` | Code review mode |
+#### `/config` — View and Modify Settings
 
-#### CLI Flags (Outside Session)
-
-| Flag | Purpose |
-|------|---------|
-| `--print` / `-p` | Output and exit (for scripts) |
-| `--continue` / `-c` | Resume last conversation |
-| `--resume` / `-r` | Resume specific session |
-| `--max-turns` | Limit agentic loops |
-| `--model` | Specify model |
-
-### Practice Exercise
-
-Run these commands and observe the output:
-1. `/help` - See all commands
-2. `/doctor` - Check installation health
-3. `/config` - View your settings
-
-### Verification
-
-```yaml
-chapter: 1.6-slash-commands
-type: manual
-verification:
-  questions:
-    - "Run /help and identify 5 useful commands"
-    - "Run /doctor and confirm no issues"
-    - "Run /config to view your settings"
-  task_key: explore_slash_commands
-```
-
-### Checklist
-
-- [ ] Used `/help` to see available commands
-- [ ] Used `/doctor` to verify installation
-- [ ] Used `/config` to see current settings
-- [ ] Know the difference between `/clear` and `/compact`
+Shows your current configuration (model, permissions, etc.) and lets you change settings. Useful for checking which model you're using or adjusting permissions.
 
 ### Instructor: Checkpoint
 
 Ask the student using AskUserQuestion:
-- **Question**: "Do you understand the main slash commands? (`/help`, `/doctor`, `/config`, `/clear`, `/compact`, `/model`)"
-- **Options**: "Yes, I understand them" / "Can you explain the difference between /clear and /compact?"
-- On "/clear vs /compact": explain that `/clear` resets the conversation completely while `/compact` compresses context to free up space without losing it entirely
+- **Question**: "Do you understand these three discovery commands? `/help` (lists all commands), `/doctor` (diagnose issues), `/config` (view/change settings)"
+- **Options**: "Yes, I understand them" / "Can you explain more?"
+- On "explain more": elaborate on each command's purpose with examples, then re-ask
 
 ### Instructor: Action
 
 Tell the student:
-"Now try these commands yourself in this session:
-1. Run `/help` — scan through the available commands
-2. Run `/doctor` — check that everything is healthy
-3. Run `/config` — look at your current settings
+"Now try these three commands yourself:
+1. Run `/help` — scan the list, note any commands that look interesting
+2. Run `/doctor` — confirm everything is healthy
+3. Run `/config` — see your current settings (model, permissions)
 
-Try them now and use the {cc-course:continue} Skill tool when you've explored them."
+Try them now and use the {cc-course:continue} Skill tool when you've explored all three."
 
 **Wait for the student to use the {cc-course:continue} Skill tool.**
 
@@ -645,23 +601,25 @@ Try to verify using MCP session search:
 
 On success: update progress.json task `explore_slash_commands`
 
+### Checklist
+
+- [ ] Used `/help` to see available commands
+- [ ] Used `/doctor` to verify installation
+- [ ] Used `/config` to see current settings
+
 ---
 
-### Session Management Commands
+## Chapter 6b: Understanding Context
 
-These commands help you manage your Claude Code sessions and context.
+**Chapter ID**: `1.6b-understanding-context`
 
-#### Session Information
+> 📚 **Deep Dive**: See [KNOWLEDGE.md — Chapter 1.6](./KNOWLEDGE.md#chapter-16-essential-slash-commands) for detailed context component explanations and debugging context loading issues.
 
-| Command | Purpose |
-|---------|---------|
-| `/context` | Show files and context currently loaded |
-| `/statusline` | Configure the status bar display |
-| `/config` | View and modify Claude Code settings |
+### Content
 
-#### Understanding /context Output
+#### What `/context` Shows
 
-The `/context` command shows you what's currently in Claude's "working memory." Here's what each component means:
+The `/context` command reveals what's in Claude's "working memory." It displays a component table:
 
 | Component | What It Shows |
 |-----------|--------------|
@@ -682,116 +640,172 @@ Your context usage percentage directly affects Claude's performance:
 | 75–90% | Consider `/compact` | Performance may start degrading |
 | 90%+ | Degraded | Use `/compact` or `/clear` immediately |
 
-#### Autocompact
-
-When context approaches the limit, Claude Code **automatically compresses** the conversation — this is called "autocompact." It:
-- Summarizes earlier messages while preserving key information
-- Keeps recent messages and tool results intact
-- Preserves CLAUDE.md content and system instructions
-- Happens transparently (you may notice a brief pause)
-
-You can trigger this manually with `/compact` at any time.
-
-#### /clear vs /compact — When to Use Each
-
-| Scenario | Use `/compact` | Use `/clear` |
-|----------|---------------|-------------|
-| Running low on context | Yes — compresses but keeps essential info | Overkill — loses everything |
-| Claude is confused or hallucinating | Sometimes helps | Yes — fresh start is better |
-| Switching to a different task | Not ideal — old context may confuse | Yes — clean slate for new task |
-| Long session, want to continue | Yes — preserves conversation summary | No — you'd lose all progress |
-| Want to try a different approach | Maybe — depends on how much to keep | Yes — start fresh |
-
-**Power workflow**: Save your plan to a file → `/clear` → load via `@plan.md` → fresh context with your plan preserved.
-
-#### Configuring /statusline
-
-The `/statusline` command configures what's displayed in Claude Code's status bar at the bottom of your terminal. This gives you at-a-glance session awareness.
-
-**Recommended items to show:**
-- **Context %** — know when you're running low
-- **Model name** — confirm which model you're using
-- **Git branch** — stay aware of your current branch
-- **Project name** — useful when working across multiple projects
-
-**How to configure:**
-1. Run `/statusline` in a Claude Code session
-2. Select which items to display
-3. Settings persist across sessions
-
-#### Session Continuation
-
-| Command / Flag | Purpose |
-|----------------|---------|
-| `/export` | Export current conversation |
-| `claude -c` | Resume last conversation (CLI flag) |
-| `claude -r <id>` | Resume specific session by ID (CLI flag) |
-
-#### Understanding Session IDs
-
-Every Claude Code session has a unique ID. You can find it by:
-- Looking at the output when starting a session
-- Using `/config` to see session info
-- Checking `~/.claude/projects/` directory
-
-Session IDs allow you to:
-- Resume a specific conversation days or weeks later
-- Share session logs for debugging
-- Export and analyze your work patterns
-
-#### Practice Exercise
-
-1. Run `/context` to see what files are loaded — note the usage percentage and components
-2. Run `/statusline` to explore display options
-3. Run `/config` to view your current settings
-4. Note your current session ID for future reference
-5. Exit Claude Code and resume with `claude -c`
-
-### Verification
-
-```yaml
-chapter: 1.6-session-commands
-type: manual
-verification:
-  questions:
-    - "Run /context and describe what files are currently loaded"
-    - "Exit Claude Code and resume with claude -c - did it work?"
-    - "What is the difference between -c and -r flags?"
-  task_key: test_session_commands
-```
-
 ### Instructor: Action
 
 Tell the student:
-"Let's explore session management:
+"Run `/context` now and look at the output carefully:
+- What is your context usage percentage?
+- Can you see your CLAUDE.md listed in the components?
+- How many messages are in the conversation so far?
 
-1. Run `/context` — look at the output carefully:
-   - What's the context usage percentage?
-   - Can you see your CLAUDE.md listed?
-   - How many messages are in the conversation?
-2. Run `/statusline` — configure your status bar to show context %, model name, and git branch
-3. Run `/export` — export this conversation (useful for saving your learning progress)
-
-Pay attention to the context usage % — this tells you how much room Claude has for more work.
-
-Try them now and use the {cc-course:continue} Skill tool when done."
+Run it now and use the {cc-course:continue} Skill tool when done."
 
 **Wait for the student to use the {cc-course:continue} Skill tool.**
 
 ### Instructor: Verify
 
-Try to verify using MCP session search:
-1. Use `mcp__cclogviewer__search_logs` or `mcp__cclogviewer__get_session_timeline` to check if the student ran `/context` in this session
-2. **Fallback**: Use AskUserQuestion to confirm: "Did you try `/context`? What was your context usage percentage?"
+Use AskUserQuestion:
+- **Question**: "What was your context usage percentage when you ran `/context`?"
+- **Options**: "Under 50%" / "50-75%" / "Over 75%" / "I'm not sure"
+- On any answer: acknowledge the result, explain what it means based on the performance table above
+- Do NOT update any task key yet — this is verified together with 6c and 6d
 
-On success: update progress.json task `test_session_commands`
+### Checklist
 
-### Additional Checklist
+- [ ] Ran `/context` and read the output
+- [ ] Know the context usage percentage
+- [ ] Can identify CLAUDE.md in the context components
 
-- [ ] Used `/context` to see loaded files
-- [ ] Explored `/statusline` options
-- [ ] Successfully resumed a session with `-c` flag
-- [ ] Understand session ID usage with `-r` flag
+---
+
+## Chapter 6c: Context Management
+
+**Chapter ID**: `1.6c-context-management`
+
+> 📚 **Deep Dive**: See [KNOWLEDGE.md — Chapter 1.6](./KNOWLEDGE.md#chapter-16-essential-slash-commands) for `/clear` vs `/compact` detailed comparison and advanced context management strategies.
+
+### Content
+
+Three tools for managing your context window:
+
+#### 1. `/compact` — Intelligent Compression
+
+Compresses your conversation while keeping essential information. Use when:
+- Context is getting full (75%+)
+- You want to continue working but need more room
+- You're in a long session
+
+**What it preserves**: CLAUDE.md, key decisions, recent messages, file contents referenced.
+**What it summarizes**: Older messages, repetitive tool outputs, earlier exploration.
+
+#### 2. `/clear` — Hard Reset
+
+Completely wipes the conversation. Use when:
+- Switching to a completely different task
+- Claude is confused or hallucinating
+- You want a fresh start
+
+**What it preserves**: CLAUDE.md (reloaded on next message), system instructions.
+**What it loses**: All conversation history, all tool results, all context.
+
+#### 3. Autocompact — Automatic Protection
+
+When context approaches the limit, Claude Code **automatically compresses** the conversation. It:
+- Summarizes earlier messages while preserving key information
+- Keeps recent messages and tool results intact
+- Happens transparently (you may notice a brief pause)
+
+#### When to Use Each
+
+| Scenario | `/compact` | `/clear` |
+|----------|-----------|----------|
+| Running low on context | Yes — compresses but keeps essentials | Overkill — loses everything |
+| Claude is confused | Sometimes helps | Yes — fresh start is better |
+| Switching to a different task | Not ideal — old context may confuse | Yes — clean slate |
+| Long session, want to continue | Yes — preserves summary | No — you'd lose all progress |
+| Want to try a different approach | Maybe — depends on what to keep | Yes — start fresh |
+
+**Power workflow**: Save your plan to a file → `/clear` → reference via `@plan.md` → fresh context with your plan preserved.
+
+### Instructor: Checkpoint
+
+Ask the student using AskUserQuestion:
+- **Question**: "Do you understand the difference between `/compact` and `/clear`? (`/compact` compresses but keeps essentials; `/clear` wipes everything except CLAUDE.md)"
+- **Options**: "Yes, I understand" / "Can you explain more?"
+- On "explain more": walk through the comparison table above with concrete examples, then re-ask
+
+### Instructor: Action
+
+Tell the student:
+"Let's experience `/clear` firsthand — this will demonstrate that your CLAUDE.md and course state survive a full reset.
+
+Run `/clear` now. After the reset, use the {cc-course:continue} Skill tool to resume the course.
+
+(Don't worry — the course tracks your progress in files, not in conversation memory. Everything will pick up right where you left off.)"
+
+**Wait for the student to use the {cc-course:continue} Skill tool.**
+
+### Instructor: Verify
+
+Use AskUserQuestion:
+- **Question**: "Did you run `/clear`? Did the course resume correctly afterward?"
+- **Options**: "Yes, it worked — course resumed fine" / "I ran /clear but had issues" / "I didn't run /clear"
+- On "had issues": troubleshoot — progress.json should persist, CLAUDE.md should reload
+- On "didn't run /clear": encourage them to try it — it's safe and demonstrates an important concept
+- Do NOT update any task key yet — verified together with 6d
+
+### Checklist
+
+- [ ] Understand `/compact` (intelligent compression)
+- [ ] Understand `/clear` (hard reset)
+- [ ] Know about autocompact (automatic protection)
+- [ ] Ran `/clear` and verified course state survived
+
+---
+
+## Chapter 6d: Status Line
+
+**Chapter ID**: `1.6d-statusline`
+
+### Content
+
+#### What `/statusline` Does
+
+The `/statusline` command configures what's displayed in Claude Code's status bar at the bottom of your terminal. This gives you at-a-glance session awareness without interrupting your work.
+
+#### Recommended Items
+
+| Item | Why It's Useful |
+|------|----------------|
+| **Context %** | Know when you're running low |
+| **Model name** | Confirm which model you're using |
+| **Git branch** | Stay aware of your current branch |
+| **Project name** | Useful when working across multiple projects |
+
+#### When It's Useful
+
+- Long coding sessions where context fills up
+- Switching between projects or branches
+- Verifying you're on the right model before complex tasks
+- Quick context awareness without running `/context`
+
+### Instructor: Action
+
+Tell the student:
+"Run `/statusline` and configure your status bar. I recommend enabling at least:
+- Context % (most important — shows when you're running low)
+- Model name
+- Git branch
+
+Settings persist across sessions, so you only need to configure this once.
+
+Run `/statusline` now and use the {cc-course:continue} Skill tool when you've configured it."
+
+**Wait for the student to use the {cc-course:continue} Skill tool.**
+
+### Instructor: Verify
+
+Use AskUserQuestion:
+- **Question**: "Did you configure your status line with `/statusline`?"
+- **Options**: "Yes, I configured it" / "I looked at it but kept defaults" / "I need help"
+- On "need help": walk them through the `/statusline` command step by step
+- On any success: update progress.json task `test_session_commands`
+
+### Checklist
+
+- [ ] Ran `/statusline`
+- [ ] Configured at least context % in the status bar
+- [ ] Understand when the status line is useful
 
 ---
 
@@ -1279,12 +1293,12 @@ tasks:
     check: "student_confirms"
 
   explore_slash_commands:
-    chapter: 1.6
+    chapter: 1.6a
     type: manual
     check: "student_confirms"
 
   test_session_commands:
-    chapter: 1.6
+    chapter: 1.6b-1.6d
     type: manual
     check: "student_confirms"
 
