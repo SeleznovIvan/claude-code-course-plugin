@@ -5,7 +5,7 @@ Schema versioning and migration logic for progress.json.
 ## Current Schema Version
 
 ```
-CURRENT_VERSION = "1.0"
+CURRENT_VERSION = "1.1"
 ```
 
 ## Version History
@@ -13,6 +13,7 @@ CURRENT_VERSION = "1.0"
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-02-10 | Initial schema with 5 modules, session tracking, exports |
+| 1.1 | 2026-02-13 | Add `mcp_project_name` to student, add `create_claudeignore` task to Module 1 |
 
 ---
 
@@ -77,7 +78,7 @@ def compare_versions(student_version, plugin_version):
 VERSION_ORDER = ["1.0", "1.1", "1.2", "2.0"]  # Add new versions here
 
 MIGRATIONS = {
-    # "1.0 → 1.1": migrate_1_0_to_1_1,
+    "1.0 → 1.1": migrate_1_0_to_1_1,
     # "1.1 → 1.2": migrate_1_1_to_1_2,
     # Add migrations as versions are released
 }
@@ -136,28 +137,25 @@ def migrate_X_to_Y(progress):
     return progress
 ```
 
-### Example: Adding New Tasks to Module 2
+### Migration 1.0 → 1.1
 
 ```python
 def migrate_1_0_to_1_1(progress):
     """
-    Add new tasks to Module 2: Skills.
+    Add MCP project name tracking and .claudeignore task.
 
     Changes:
-    - Added task: advanced_skill_patterns
-    - Added task: skill_documentation
+    - Added student.mcp_project_name field (default: null)
+    - Added task: create_claudeignore to Module 1
     """
-    module_2 = progress["modules"]["2-skills"]
+    # Add mcp_project_name to student
+    if "mcp_project_name" not in progress.get("student", {}):
+        progress["student"]["mcp_project_name"] = None
 
-    # Add new tasks with default false (not completed)
-    new_tasks = {
-        "advanced_skill_patterns": False,
-        "skill_documentation": False,
-    }
-
-    for task, default in new_tasks.items():
-        if task not in module_2["tasks"]:
-            module_2["tasks"][task] = default
+    # Add create_claudeignore task to Module 1
+    module_1 = progress["modules"]["1-foundations-and-commands"]
+    if "create_claudeignore" not in module_1["tasks"]:
+        module_1["tasks"]["create_claudeignore"] = False
 
     return progress
 ```
@@ -208,8 +206,7 @@ def migrate_1_2_to_2_0(progress):
 Welcome back! The course plugin has been updated.
 
 Migrating your progress from v{old} to v{new}...
-✓ Migration 1.0 → 1.1: Added new tasks for Module 2
-✓ Migration 1.1 → 1.2: Added feedback fields
+✓ Migration 1.0 → 1.1: Added MCP project name tracking and .claudeignore task
 
 Your progress is preserved:
 - Module 1: Completed ✓

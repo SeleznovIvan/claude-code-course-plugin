@@ -44,10 +44,16 @@ Track hint level in progress.json under current task.
 - **L3**: "Even simple conventions help: 'We use camelCase for variables, PascalCase for components.'"
 
 #### claude_md_quality
-- **L1**: "Run /cc-course:validate to check your CLAUDE.md quality. Look for warnings about size and placeholders."
+- **L1**: "Use the {cc-course:validate} Skill tool to check your CLAUDE.md quality. Look for warnings about size and placeholders."
 - **L2**: "Common issues: TODO markers, unfilled [brackets], missing sections. Check the validation output."
 - **L3**: "Quality checks: < 500 lines, < 40K chars, has Overview/Tech Stack/Conventions/Commands sections."
 - **L4**: "Let me review your CLAUDE.md and suggest specific improvements."
+
+#### create_claudeignore
+- **L1**: "Create a `.claudeignore` file in your project root — it works like `.gitignore` but for Claude Code's file access."
+- **L2**: "At minimum, add: `.env`, `.env.*`, `*.pem`, `*.key`, `credentials.json`"
+- **L3**: "Create the file: `touch .claudeignore` then edit it to add the patterns listed in the lesson."
+- **L4**: "Let me help you create it. We'll start with the recommended patterns and add any project-specific ones."
 
 ---
 

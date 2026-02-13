@@ -151,6 +151,44 @@ When Claude uses tools, you'll see indicators:
 - `Ctrl+C` — Cancel current operation (once)
 - `Ctrl+C` twice — Hard exit
 
+#### Security: .claudeignore
+
+The `.claudeignore` file controls which files Claude Code is **not allowed to read**. This is critical for security because Claude Code has full filesystem access within your project.
+
+**How it works:**
+- Uses the same glob pattern syntax as `.gitignore`
+- Placed in the project root
+- Claude Code checks this file before reading any file
+- Matched files are completely invisible to Claude — it cannot read, reference, or suggest changes to them
+
+**Important distinction from .gitignore:**
+- `.gitignore` prevents files from being tracked by git
+- `.claudeignore` prevents files from being read by Claude Code
+- A file in `.gitignore` is still readable by Claude unless also in `.claudeignore`
+- Both files should include secrets and credentials
+
+**Recommended patterns:**
+```
+# Secrets and credentials
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+service-account*.json
+**/secrets/**
+
+# Package manager auth tokens
+.npmrc
+.pypirc
+```
+
+**When to add more patterns:**
+- Private keys or certificates (`*.pfx`, `*.p12`)
+- Local override configs with passwords (`docker-compose.override.yml`)
+- Database dumps or seed files with real data
+- Any file containing API keys, tokens, or passwords
+
 ### External Resources
 
 **Official Docs:**
@@ -219,6 +257,36 @@ project/
 ```
 
 Claude loads child CLAUDE.md files when working in those directories.
+
+#### CLAUDE.md Best Practices Checklist
+
+Use this checklist when reviewing an existing CLAUDE.md or evaluating a newly created one:
+
+**Structure (required sections):**
+- [ ] Project overview — 2-3 sentences describing what the project does
+- [ ] Tech stack — language, framework, testing, build tools
+- [ ] Conventions — naming, file organization, code style
+- [ ] Common commands — test, build, dev server, lint
+- [ ] Key files — important entry points, configuration files
+
+**Quality indicators:**
+- [ ] Under 500 lines (warn at 300)
+- [ ] Under 40,000 characters
+- [ ] No TODO/FIXME placeholders remaining
+- [ ] No unfilled `[bracket]` placeholders
+- [ ] Uses `@path/to/file` references for detailed specs (if > 200 lines)
+
+**Effectiveness:**
+- [ ] Contains specific instructions, not generic advice
+- [ ] References actual file paths in the project
+- [ ] Includes "what NOT to do" rules where relevant
+- [ ] Commands are correct and runnable
+- [ ] Tech stack matches actual dependencies (check package.json, requirements.txt, etc.)
+
+**Advanced (optional but recommended):**
+- [ ] Hierarchical CLAUDE.md files in subdirectories for large projects
+- [ ] Skills referenced for reusable procedures (`.claude/skills/`)
+- [ ] Architecture section with directory structure explanation
 
 ### External Resources
 
@@ -316,6 +384,54 @@ ls ~/.claude/projects/
 - Share logs for debugging
 - Export for analysis
 
+#### Context Management Deep Dive
+
+Understanding context is crucial for effective Claude Code usage. The context window is Claude's "working memory" — everything it can reference at once.
+
+**What counts toward context:**
+- System prompt (base instructions)
+- CLAUDE.md file content
+- All conversation messages (your prompts + Claude's responses)
+- Tool results (file reads, command output, search results)
+- Skill/command content when invoked
+
+**Performance by context usage:**
+
+| Usage Range | Performance Impact | What To Do |
+|-------------|-------------------|------------|
+| 0–50% | Full quality, fast responses | Keep working normally |
+| 50–75% | Good quality, slightly slower | Monitor, start planning compaction |
+| 75–90% | Noticeable quality drop | Run `/compact` to free space |
+| 90–100% | Degraded, may miss details | Run `/compact` or `/clear` immediately |
+
+**Autocompact behavior:**
+- Triggers automatically when context approaches the limit
+- Summarizes earlier conversation while preserving recent messages
+- CLAUDE.md and system instructions are always preserved
+- You may notice a brief pause when it runs
+- Manual `/compact` gives you control over when compression happens
+
+**Practical context workflows:**
+
+1. **Long task**: Work → check `/context` → `/compact` when over 75% → continue
+2. **Fresh start with plan**: Write plan to file → `/clear` → reference `@plan.md` → work in clean context
+3. **Multiple attempts**: If approach isn't working → `/clear` → try different angle with full context available
+
+#### /statusline Best Practices
+
+The status line provides persistent, at-a-glance information while you work. Configuring it well reduces the need to run `/context` or `/config` repeatedly.
+
+**Recommended configuration:**
+- **Context usage %** — the most important metric; tells you when to compact
+- **Model name** — confirms you're on the right model (Sonnet vs Opus)
+- **Git branch** — prevents accidental commits to wrong branches
+- **Project name** — helps when switching between projects
+
+**When it's especially useful:**
+- Long coding sessions where context fills up
+- Working across multiple projects in different terminals
+- Pair programming or screen sharing (others can see your session state)
+
 #### CLI Flags Reference
 
 | Flag | Long Form | Purpose |
@@ -393,6 +509,28 @@ Red flags:
 > "I'll create a new Login component with standard React patterns and add appropriate tests."
 
 The good plan shows Claude understands your specific codebase.
+
+#### Plan Mode as a Thinking Tool
+
+Plan mode is most powerful when used as a **deliberation tool** rather than an execution step:
+
+**The iterate-and-discard pattern:**
+1. Enter plan mode → request a plan
+2. Iterate 2-3 times with feedback ("What about X?", "Can you split step 3?")
+3. Press Escape to exit **without executing**
+4. Save the plan to a file if it's good: copy the plan to `plan.md`
+5. `/clear` to get fresh context
+6. Reference `@plan.md` and execute with full context available
+
+**Why this works:**
+- Planning consumes context — a long planning session can eat 30-50% of your context window
+- By saving the plan to a file and clearing, you get the best of both worlds: a well-thought-out plan AND full context for execution
+- The iterate step catches edge cases and improves plan quality before any code is written
+
+**Warning about context during planning:**
+- Each iteration adds to context usage
+- Long planning sessions (5+ rounds) can consume significant context
+- If you see context above 60% after planning, consider the save → clear → reload pattern
 
 #### Plan Modification Techniques
 
@@ -476,6 +614,34 @@ Is it invoked with a slash command?
 
 **Commands**: Explicit invocation, often with parameters, specific tasks
 **Skills**: Reusable knowledge, can be auto-detected, encode patterns
+
+#### Using Claude Code to Build Claude Code
+
+A core practice: **always use Claude Code to create Claude Code configurations**. This applies to:
+
+- **Commands** — Prompt Claude to create `.claude/commands/*.md` files
+- **Skills** — Prompt Claude to create `.claude/skills/*.md` files
+- **Hooks** — Prompt Claude to configure `.claude/hooks/` entries
+- **CLAUDE.md** — Use `/init` or prompt Claude to enhance your CLAUDE.md
+- **MCP configs** — Prompt Claude to set up `.mcp.json`
+
+**Why this works better than manual creation:**
+1. **Claude knows the format** — correct frontmatter, proper sections, valid syntax
+2. **Adapts to your project** — Claude reads your codebase and tailors instructions accordingly
+3. **Practices prompting** — the meta-skill of describing what you want Claude to build
+4. **Catches mistakes** — Claude validates its own output against conventions
+
+**Example workflow:**
+```
+You: "Create a /review command that reviews the current git diff,
+     checks for our team's coding standards, and outputs a summary"
+
+Claude: [reads your CLAUDE.md, understands your conventions,
+        creates .claude/commands/review.md with proper frontmatter
+        and project-specific instructions]
+
+You: [review the result, test it, suggest tweaks]
+```
 
 #### Testing Custom Commands
 

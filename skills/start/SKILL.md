@@ -105,6 +105,60 @@ After initialization, always read/write progress from:
 
 NOT from the plugin's template `progress.json`.
 
+## MCP Project Name Detection
+
+On first start (when `student.mcp_project_name` is null), detect and save the MCP project name for reliable session tracking:
+
+### Detection Flow
+
+```python
+if progress["student"]["mcp_project_name"] is None:
+    detect_mcp_project_name(progress, student_repo)
+```
+
+### Detection Steps
+
+1. **Call MCP** to list available projects:
+   ```
+   mcp__cclogviewer__list_projects(sort_by="last_modified")
+   ```
+
+2. **Match student's repository path** to a project name:
+   - Compare `student.repository` path against project names/paths
+   - Project names in cclogviewer are typically the absolute path to the project directory
+
+3. **Save matched name** to progress.json:
+   ```json
+   {
+     "student": {
+       "mcp_project_name": "/Users/student/my-project"
+     }
+   }
+   ```
+
+4. **Fallback**: If MCP is unavailable or no match found, use the repository path:
+   ```python
+   progress["student"]["mcp_project_name"] = student_repo
+   ```
+
+### Usage in MCP Calls
+
+After detection, **always** use `mcp_project_name` for MCP calls instead of auto-detecting from cwd:
+
+```python
+project_name = progress["student"]["mcp_project_name"]
+
+# Example: list sessions
+mcp__cclogviewer__list_sessions(project=project_name, days=1, limit=1)
+
+# Example: search logs
+mcp__cclogviewer__search_logs(project=project_name, query="...")
+```
+
+This ensures consistent session tracking even if the student's working directory changes between sessions.
+
+---
+
 ## Schema Version Check and Migration
 
 Before proceeding with the module start, check if the student's progress.json needs migration.
@@ -114,7 +168,7 @@ For the complete migration logic, see [migration.md](../migration.md).
 ### Migration Check Flow
 
 ```python
-CURRENT_VERSION = "1.0"  # Plugin's current schema version
+CURRENT_VERSION = "1.1"  # Plugin's current schema version
 
 def check_and_migrate(progress, progress_path):
     """Check schema version and run migrations if needed."""
@@ -204,7 +258,7 @@ When this command is invoked:
 
 1. **Get current session ID** using MCP cclogviewer:
    ```
-   mcp__cclogviewer__list_sessions(project=<cwd>, days=1, limit=1)
+   mcp__cclogviewer__list_sessions(project=progress["student"]["mcp_project_name"], days=1, limit=1)
    ```
 
 2. **Create session record** in progress.json:

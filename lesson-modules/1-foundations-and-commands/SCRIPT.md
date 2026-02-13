@@ -42,7 +42,7 @@ Quick reference showing which interactive phases each chapter has:
 |---------|---------|------------|--------|--------|
 | 1 — What is Claude Code? | yes | yes | — | — |
 | 2 — Installation | yes | yes | — | — |
-| 3 — CLI Basics | yes | yes | — | — |
+| 3 — CLI Basics | yes | yes | yes | yes |
 | 4 — CLAUDE.md | yes | yes | yes | yes |
 | 5 — Testing Setup | yes | yes | yes | yes |
 | 6 — Slash Commands | yes | yes | yes | yes |
@@ -174,12 +174,95 @@ Ask the student using AskUserQuestion:
 - **Options**: "Yes, clear" / "Can you explain the difference again?"
 - On "explain again": clarify that interactive is for back-and-forth, one-shot runs and exits, print mode outputs text only (useful for scripts/piping)
 
+### Security: Creating .claudeignore
+
+#### Why .claudeignore Matters
+
+Claude Code can read any file in your project. A `.claudeignore` file tells Claude which files to **never read or reference**, protecting sensitive data like API keys, certificates, and credentials.
+
+It works like `.gitignore` — pattern-based file exclusion — but specifically for Claude Code's file access.
+
+#### Recommended .claudeignore Contents
+
+```
+# Secrets and credentials
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+service-account*.json
+**/secrets/**
+
+# Package manager auth
+.npmrc
+.pypirc
+```
+
+#### .claudeignore vs .gitignore
+
+| Feature | .claudeignore | .gitignore |
+|---------|--------------|------------|
+| **Scope** | Claude Code file access | Git tracking |
+| **Purpose** | Prevent AI from reading sensitive files | Prevent committing files |
+| **Location** | Project root | Project root |
+| **Overlap** | Should include secrets even if in .gitignore | Doesn't affect Claude |
+
+**Key insight**: Even if a file is in `.gitignore`, Claude can still read it unless it's also in `.claudeignore`. Always add secrets to both.
+
+### Verification
+
+```yaml
+chapter: 1.3-claudeignore
+type: automated
+verification:
+  checks:
+    - file_exists: ".claudeignore"
+      task_key: create_claudeignore
+```
+
+### Instructor: Action
+
+Tell the student:
+"Before we set up your project memory, let's secure your project first. Create a `.claudeignore` file in your repository root to protect sensitive files from being read by Claude Code.
+
+Create the file at `.claudeignore` (in your project root) with at least these patterns:
+```
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+service-account*.json
+**/secrets/**
+.npmrc
+.pypirc
+```
+
+You can add more patterns specific to your project (e.g., `*.pfx`, `docker-compose.override.yml`, local config files).
+
+Create the file now and use the {cc-course:continue} Skill tool when done."
+
+**Wait for the student to use the {cc-course:continue} Skill tool.**
+
+### Instructor: Verify
+
+Run this check in the student's repository:
+
+1. **file_exists**: Use Glob to check `.claudeignore` exists in the repo root
+2. **content_check**: Use Read to verify it contains at least `.env` and `*.key` patterns
+
+**On failure**: Tell the student what's missing. Wait for {cc-course:continue}, then re-verify.
+
+**On success**: Update progress.json task `create_claudeignore`.
+
 ### Checklist
 
 - [ ] Can start an interactive Claude session
 - [ ] Understand difference between `claude`, `claude "prompt"`, and `claude -p`
 - [ ] Know how to exit a session (`exit` or Ctrl+D)
 - [ ] Understand what Claude shows when using tools
+- [ ] Created `.claudeignore` to protect sensitive files
 
 ---
 
@@ -319,21 +402,41 @@ Ask the student using AskUserQuestion:
 
 ### Instructor: Action
 
-Tell the student to do the following themselves — **DO NOT create or edit CLAUDE.md for them**:
+**DO NOT create or edit CLAUDE.md for the student** — guide them to do it themselves.
 
-1. **Navigate to their repository** (if not already there)
-2. **Run `/init`** to auto-generate a CLAUDE.md
-3. **Review** the generated file — read through it and see what Claude detected
-4. **Enhance it** by adding or improving these sections:
-   - Project overview (2-3 sentences describing the project)
-   - Tech stack (language, framework, testing, build tools)
-   - Conventions (naming, file organization, code style)
-   - Common commands (test, build, dev server, lint)
-5. **Remove any placeholder text** (TODO, FIXME, unfilled `[brackets]`)
+#### Step 1: Check if CLAUDE.md Already Exists
 
-Say: "Go ahead and run `/init` in your repository now. Review what it generates, then enhance it with your project's specifics. Run `/cc-course:continue` when you're done."
+Use Glob to check if `CLAUDE.md` exists in the student's repository root.
 
-**Wait for the student to run `/cc-course:continue` before proceeding.**
+#### If CLAUDE.md EXISTS:
+
+1. **Read it** and evaluate against the best practices checklist (see KNOWLEDGE.md Chapter 1.4)
+2. **Give specific feedback** on what's present and what's missing:
+   - Does it have a project overview? Tech stack? Conventions? Commands?
+   - Is it under 500 lines? Free of TODO/FIXME placeholders?
+   - Does it use `@path` references for long sections?
+   - Are file paths and commands accurate?
+3. **Tell the student**: "You already have a CLAUDE.md — great! I've reviewed it and here's what I found: [specific feedback]. Please enhance it by [specific improvements needed]."
+
+#### If CLAUDE.md DOES NOT EXIST:
+
+1. **Tell the student** to run `/init` to auto-generate a CLAUDE.md
+2. **After they run it**, review the generated file
+
+#### Step 2: Enhance (both paths)
+
+Tell the student to add or improve these sections:
+- Project overview (2-3 sentences describing the project)
+- Tech stack (language, framework, testing, build tools)
+- Conventions (naming, file organization, code style)
+- Common commands (test, build, dev server, lint)
+- Remove any placeholder text (TODO, FIXME, unfilled `[brackets]`)
+
+Say the appropriate message:
+- **If exists**: "I've reviewed your CLAUDE.md and here are my suggestions: [feedback]. Enhance it with the improvements above. Use the {cc-course:continue} Skill tool when you're done."
+- **If not exists**: "Run `/init` in your repository now. Review what it generates, then enhance it with your project's specifics. Use the {cc-course:continue} Skill tool when you're done."
+
+**Wait for the student to use the {cc-course:continue} Skill tool before proceeding.**
 
 ### Instructor: Verify
 
@@ -347,7 +450,7 @@ Run ALL these checks in the student's repository before marking complete:
    - No unfilled `[bracket]` placeholders
    - Has at least 4 meaningful sections
 
-**On failure**: Tell the student specifically what's missing (e.g., "Your CLAUDE.md is missing a Tech Stack section"). Wait for `/cc-course:continue`, then re-verify.
+**On failure**: Tell the student specifically what's missing (e.g., "Your CLAUDE.md is missing a Tech Stack section"). Wait for {cc-course:continue}, then re-verify.
 
 **On success**: Update progress.json tasks: `create_claude_md`, `add_project_overview`, `add_tech_stack`, `add_conventions`, `claude_md_quality`.
 
@@ -413,7 +516,7 @@ verification:
 Ask the student using AskUserQuestion:
 - **Question**: "Ready to test your CLAUDE.md by asking me questions about your project? This will show whether the file is working well."
 - **Options**: "Yes, let's test it" / "I want to tweak my CLAUDE.md first"
-- On "tweak first": let them make changes, wait for `/cc-course:continue`
+- On "tweak first": let them make changes, wait for {cc-course:continue}
 
 ### Instructor: Action
 
@@ -428,7 +531,7 @@ Ask at least 2-3 of these. If my answers are wrong or vague, that means your CLA
 
 **Answer the student's questions based on what you can read from their CLAUDE.md.** If your answers are inaccurate, help them identify what to add to CLAUDE.md.
 
-After a few rounds of Q&A, ask: "Are you satisfied with how well I understand your project? Run `/cc-course:continue` when ready."
+After a few rounds of Q&A, ask: "Are you satisfied with how well I understand your project? Use the {cc-course:continue} Skill tool when ready."
 
 ### Instructor: Verify
 
@@ -530,9 +633,9 @@ Tell the student:
 2. Run `/doctor` — check that everything is healthy
 3. Run `/config` — look at your current settings
 
-Try them now and run `/cc-course:continue` when you've explored them."
+Try them now and use the {cc-course:continue} Skill tool when you've explored them."
 
-**Wait for the student to run `/cc-course:continue`.**
+**Wait for the student to use the {cc-course:continue} Skill tool.**
 
 ### Instructor: Verify
 
@@ -556,6 +659,66 @@ These commands help you manage your Claude Code sessions and context.
 | `/statusline` | Configure the status bar display |
 | `/config` | View and modify Claude Code settings |
 
+#### Understanding /context Output
+
+The `/context` command shows you what's currently in Claude's "working memory." Here's what each component means:
+
+| Component | What It Shows |
+|-----------|--------------|
+| **System prompt** | Base instructions Claude follows (always present) |
+| **CLAUDE.md** | Your project memory file content |
+| **Messages** | Conversation history (your prompts + Claude's responses) |
+| **Tool results** | Output from file reads, command execution, etc. |
+| **Context usage %** | How full the context window is |
+
+#### Context Usage and Performance
+
+Your context usage percentage directly affects Claude's performance:
+
+| Usage | Status | Recommendation |
+|-------|--------|----------------|
+| 0–50% | Optimal | Full performance, plenty of room |
+| 50–75% | Good | Working well, monitor if doing large tasks |
+| 75–90% | Consider `/compact` | Performance may start degrading |
+| 90%+ | Degraded | Use `/compact` or `/clear` immediately |
+
+#### Autocompact
+
+When context approaches the limit, Claude Code **automatically compresses** the conversation — this is called "autocompact." It:
+- Summarizes earlier messages while preserving key information
+- Keeps recent messages and tool results intact
+- Preserves CLAUDE.md content and system instructions
+- Happens transparently (you may notice a brief pause)
+
+You can trigger this manually with `/compact` at any time.
+
+#### /clear vs /compact — When to Use Each
+
+| Scenario | Use `/compact` | Use `/clear` |
+|----------|---------------|-------------|
+| Running low on context | Yes — compresses but keeps essential info | Overkill — loses everything |
+| Claude is confused or hallucinating | Sometimes helps | Yes — fresh start is better |
+| Switching to a different task | Not ideal — old context may confuse | Yes — clean slate for new task |
+| Long session, want to continue | Yes — preserves conversation summary | No — you'd lose all progress |
+| Want to try a different approach | Maybe — depends on how much to keep | Yes — start fresh |
+
+**Power workflow**: Save your plan to a file → `/clear` → load via `@plan.md` → fresh context with your plan preserved.
+
+#### Configuring /statusline
+
+The `/statusline` command configures what's displayed in Claude Code's status bar at the bottom of your terminal. This gives you at-a-glance session awareness.
+
+**Recommended items to show:**
+- **Context %** — know when you're running low
+- **Model name** — confirm which model you're using
+- **Git branch** — stay aware of your current branch
+- **Project name** — useful when working across multiple projects
+
+**How to configure:**
+1. Run `/statusline` in a Claude Code session
+2. Select which items to display
+3. Settings persist across sessions
+
 #### Session Continuation
 
 | Command / Flag | Purpose |
@@ -578,7 +741,7 @@ Session IDs allow you to:
 
 #### Practice Exercise
 
-1. Run `/context` to see what files are loaded in your session
+1. Run `/context` to see what files are loaded — note the usage percentage and components
 2. Run `/statusline` to explore display options
 3. Run `/config` to view your current settings
 4. Note your current session ID for future reference
@@ -600,19 +763,26 @@ verification:
 ### Instructor: Action
 
 Tell the student:
-"Let's try the session management commands:
-1. Run `/context` — see what files and context are currently loaded in this session
-2. Run `/export` — export this conversation (useful for saving your learning progress)
+"Let's explore session management:
 
-Try them now and run `/cc-course:continue` when done."
+1. Run `/context` — look at the output carefully:
+   - What's the context usage percentage?
+   - Can you see your CLAUDE.md listed?
+   - How many messages are in the conversation?
+2. Run `/statusline` — configure your status bar to show context %, model name, and git branch
+3. Run `/export` — export this conversation (useful for saving your learning progress)
 
-**Wait for the student to run `/cc-course:continue`.**
+Pay attention to the context usage % — this tells you how much room Claude has for more work.
+
+Try them now and use the {cc-course:continue} Skill tool when done."
+
+**Wait for the student to use the {cc-course:continue} Skill tool.**
 
 ### Instructor: Verify
 
 Try to verify using MCP session search:
 1. Use `mcp__cclogviewer__search_logs` or `mcp__cclogviewer__get_session_timeline` to check if the student ran `/context` in this session
-2. **Fallback**: Use AskUserQuestion to confirm: "Did you try `/context` and `/export`?"
+2. **Fallback**: Use AskUserQuestion to confirm: "Did you try `/context`? What was your context usage percentage?"
 
 On success: update progress.json task `test_session_commands`
 
@@ -666,8 +836,9 @@ Plan mode makes Claude explain its approach **before** executing. This is useful
 
 1. Enter plan mode (`Shift+Tab`)
 2. Ask: "Plan how to add [a feature relevant to your project]"
-3. Review the plan Claude generates
-4. Do NOT execute - just observe the plan quality
+3. Review the plan — ask Claude to modify or improve it (2-3 rounds)
+4. Press `Escape` to exit plan mode **without executing**
+5. Key takeaway: plan mode is for thinking — you control whether anything gets executed
 
 ### Verification
 
@@ -692,30 +863,38 @@ Ask the student using AskUserQuestion:
 ### Instructor: Action
 
 Tell the student:
-"Let's try plan mode now:
-1. Press `Shift+Tab` to toggle plan mode ON (you'll see an indicator)
-2. Ask Claude to plan something for your project — e.g., 'Plan how to add [a feature relevant to your codebase]'
-3. Review the plan Claude generates — notice it explains the approach without executing
-4. You can provide feedback on the plan or just observe
+"Let's try plan mode as a **thinking tool** — we'll generate a plan, iterate on it, and then exit **without executing**:
 
-Try it now. When you've seen a plan generated, run `/cc-course:continue`."
+1. **Enter plan mode**: Press `Shift+Tab` (you'll see a plan mode indicator)
+2. **Request a plan**: Ask Claude to plan a feature for your project — e.g., 'Plan how to add [something relevant to your codebase]'
+3. **Iterate on the plan** (2-3 rounds): Give feedback like:
+   - 'What about edge cases?'
+   - 'Can you split step 3 into smaller parts?'
+   - 'What if we used [alternative approach] instead?'
+4. **Exit with Escape**: Press `Escape` to deactivate plan mode **WITHOUT accepting or executing the plan**
 
-**Wait for the student to run `/cc-course:continue`.**
+The key lesson: plan mode is for **thinking and exploring** approaches. You always control whether anything gets executed. Pressing Escape discards the plan safely.
+
+Try it now. When you've gone through all 4 steps, use the {cc-course:continue} Skill tool."
+
+**Wait for the student to use the {cc-course:continue} Skill tool.**
 
 ### Instructor: Verify
 
-Try to verify using MCP session search:
-1. Use `mcp__cclogviewer__search_logs` or `mcp__cclogviewer__get_session_timeline` to check for plan mode activity in this session
-2. **Fallback**: Use AskUserQuestion: "Did you enter plan mode and see a plan generated?"
-
-On success: update progress.json task `use_plan_mode`
+Use AskUserQuestion:
+- **Question**: "Did you complete all 4 steps? (1) Enter plan mode, (2) Generate a plan, (3) Iterate on it with feedback, (4) Exit with Escape without executing"
+- **Options**: "Yes, I did all 4 steps" / "I generated a plan but didn't iterate" / "I need to try again"
+- On "didn't iterate": encourage them to try again with 2-3 rounds of feedback, wait for {cc-course:continue}
+- On "need to try again": wait for {cc-course:continue}, then re-verify
+- On success: update progress.json task `use_plan_mode`
 
 ### Checklist
 
 - [ ] Know how to enter plan mode (Shift+Tab)
 - [ ] Generated at least one plan without executing
+- [ ] Iterated on a plan (asked for modifications 2-3 times)
+- [ ] Exited plan mode with Escape WITHOUT executing
 - [ ] Understand when plan mode is appropriate
-- [ ] Can review and evaluate a generated plan
 
 ---
 
@@ -839,27 +1018,37 @@ Ask the student using AskUserQuestion:
 
 ### Instructor: Action
 
-Tell the student — **DO NOT create the command for them**:
+> **NOTE**: Unlike other ACTION phases where the student must do the work manually, here the student **prompts Claude Code to create the command for them** — that's the core lesson. You (the instructor) ARE allowed to create files when the student asks you to.
 
-"Now create your own custom command! Here are ideas based on your role:
+Tell the student:
+"Now it's time to create your own custom command — but here's the key: **you MUST use Claude Code to create it**. This is a fundamental practice: use Claude Code to build Claude Code configurations.
 
-| Role | Command Idea |
-|------|--------------|
-| Frontend | `/new-component` — Create component with styles and tests |
-| Backend | `/new-endpoint` — Create API endpoint with validation |
-| QA | `/test-suite` — Generate test suite for a module |
-| DevOps | `/new-service` — Scaffold service configuration |
-| Data | `/new-pipeline` — Create data pipeline template |
+**Why?** Claude already knows the correct format, frontmatter, and conventions. Prompting Claude to create commands:
+- Ensures proper structure (frontmatter, sections)
+- Adapts to your project automatically
+- Practices the prompting skill you'll use daily
 
-Steps:
-1. Create the directory: `mkdir -p .claude/commands`
-2. Create a markdown file: `.claude/commands/[your-command].md`
-3. Add frontmatter with `name` and `description`
-4. Add instructions for what Claude should do when the command is invoked
+**Your task:**
+1. First, create the commands directory: `mkdir -p .claude/commands`
+2. Then **prompt me** (Claude) to create a command for you. Here are role-specific prompt examples:
 
-Create your command now and run `/cc-course:continue` when done."
+| Role | Example Prompt |
+|------|---------------|
+| Frontend | 'Create a `/new-component` command that scaffolds a React component with styles and tests in my project's structure' |
+| Backend | 'Create a `/new-endpoint` command that generates an API endpoint with validation following my project patterns' |
+| QA | 'Create a `/test-suite` command that generates a test suite for a given module' |
+| DevOps | 'Create a `/new-service` command that scaffolds a service configuration' |
+| Data | 'Create a `/new-pipeline` command that creates a data pipeline template' |
 
-**Wait for the student to run `/cc-course:continue`.**
+3. After I create it, **review the result**:
+   - Does the frontmatter have `name` and `description`?
+   - Do the instructions make sense for your project?
+   - Would you tweak anything?
+4. Test it by running your new command
+
+Prompt me now to create your command. Use the {cc-course:continue} Skill tool when you've reviewed and tested it."
+
+**Wait for the student to use the {cc-course:continue} Skill tool.**
 
 ### Instructor: Verify
 
@@ -876,17 +1065,17 @@ Run these checks in the student's repository:
 
 Give the student a brief review of their command — what's good, what could be improved.
 
-Wait for `/cc-course:continue` after fixes, then re-verify.
+Wait for {cc-course:continue} after fixes, then re-verify.
 
 **On success**: Update progress.json tasks: `create_commands_directory`, `create_custom_command`, `valid_command_format`
 
 ### Checklist
 
+- [ ] Prompted Claude Code to create a custom command
 - [ ] Created `.claude/commands/` directory
 - [ ] Created at least one custom command file
-- [ ] Command has proper frontmatter (name, description)
+- [ ] Reviewed the command: frontmatter, structure, instructions
 - [ ] Tested the command with Claude
-- [ ] Command appears in `/help` output
 
 ---
 
@@ -904,6 +1093,7 @@ After completing this seminar, you should have:
 
 ```
 your-repo/
+├── .claudeignore          # Security: sensitive file exclusions
 ├── CLAUDE.md              # Project memory file
 └── .claude/
     └── commands/
@@ -914,7 +1104,7 @@ your-repo/
 
 ```bash
 # Stage your files
-git add CLAUDE.md .claude/
+git add .claudeignore CLAUDE.md .claude/
 
 # Commit with descriptive message
 git commit -m "Add Claude Code configuration
@@ -953,9 +1143,9 @@ Tell the student:
    - Add custom command for [your workflow]\"
    ```
 
-Run these commands now and run `/cc-course:continue` when done."
+Run these commands now and use the {cc-course:continue} Skill tool when done."
 
-**Wait for the student to run `/cc-course:continue`.**
+**Wait for the student to use the {cc-course:continue} Skill tool.**
 
 ### Instructor: Verify
 
@@ -964,7 +1154,7 @@ Run these checks:
 2. Check that the latest commit includes CLAUDE.md and `.claude/commands`
 3. Alternatively, run `git diff --cached --name-only` or `git show --name-only HEAD` to verify committed files
 
-**On failure**: Tell the student what's not committed yet. Wait for `/cc-course:continue`, then re-verify.
+**On failure**: Tell the student what's not committed yet. Wait for {cc-course:continue}, then re-verify.
 
 **On success**: Update progress.json tasks: `commit_claude_md`, `commit_commands`
 
@@ -990,6 +1180,7 @@ Run these checks:
 
 | File | Purpose |
 |------|---------|
+| `.claudeignore` | Security: excludes sensitive files from Claude |
 | `CLAUDE.md` | Project context and memory |
 | `.claude/commands/*.md` | Custom slash commands |
 
@@ -1052,6 +1243,11 @@ seminar: 1-foundations-and-commands
 # Note: Chapters 1-3 (installation, authentication, CLI basics) are covered
 # in the offline Installation Guide PDF. Validation starts from Chapter 4.
 tasks:
+  create_claudeignore:
+    chapter: 1.3
+    type: automated
+    check: "file_exists:.claudeignore"
+
   create_claude_md:
     chapter: 1.4
     type: automated

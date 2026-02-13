@@ -1,10 +1,11 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "student": {
     "name": null,
     "role": null,
     "repository": null,
-    "started_at": null
+    "started_at": null,
+    "mcp_project_name": null
   },
   "modules": {
     "1-foundations-and-commands": {
@@ -18,6 +19,7 @@
         "add_project_overview": false,
         "add_tech_stack": false,
         "add_conventions": false,
+        "create_claudeignore": false,
         "test_claude_understanding": false,
         "explore_slash_commands": false,
         "test_session_commands": false,

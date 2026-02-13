@@ -9,12 +9,86 @@ The student is signaling they are ready to proceed to the next phase.
 
 ## Instructions
 
-1. Read `progress.json` from the plugin root
+1. Read `progress.json` from the student's data directory
 2. Extract `current_module` and `current_task`
 3. If found, output: **Continuing — Module: [current_module], Task: [current_task]**
 4. If `progress.json` is missing or fields are empty, output: **Ready to continue.**
-5. Resume the teaching flow — proceed to the next phase for the current chapter:
-   - After **ACTION** phase → run **VERIFY**
-   - After failed **VERIFY** → re-run **VERIFY**
-   - After **CHECKPOINT** "I need more time" → resume where the student left off
-   - After **CHECKLIST** → advance to the next chapter
+
+## Session Tracking
+
+Before resuming, check if the session has changed (e.g., student closed and reopened Claude Code):
+
+### Session Check Flow
+
+```python
+mcp_project = progress["student"]["mcp_project_name"]
+
+if mcp_project:
+    try:
+        # Get the most recent session
+        latest = mcp__cclogviewer__list_sessions(
+            project=mcp_project,
+            days=1,
+            limit=1
+        )
+
+        latest_session_id = latest[0]["session_id"]
+        current_session_id = progress.get("current_session_id")
+
+        if latest_session_id != current_session_id:
+            # Session changed — close old, start new
+            close_old_session(progress, current_session_id)
+            create_new_session(progress, latest_session_id)
+        # else: same session, no action needed
+
+    except Exception:
+        # MCP unavailable — skip session tracking, log warning
+        pass
+```
+
+### Closing Old Session
+
+```python
+def close_old_session(progress, old_session_id):
+    """Set ended_at on the old session record."""
+    if old_session_id is None:
+        return
+    module_key = progress["current_module"]
+    if module_key:
+        for session in progress["modules"][module_key].get("sessions", []):
+            if session["session_id"] == old_session_id:
+                session["ended_at"] = current_iso_timestamp()
+                break
+```
+
+### Creating New Session
+
+```python
+def create_new_session(progress, new_session_id):
+    """Create a new session record and update current_session_id."""
+    module_key = progress["current_module"]
+    if module_key:
+        progress["modules"][module_key]["sessions"].append({
+            "session_id": new_session_id,
+            "started_at": current_iso_timestamp(),
+            "ended_at": None,
+            "tasks_completed": []
+        })
+    progress["current_session_id"] = new_session_id
+```
+
+### MCP Unavailable
+
+If `mcp_project_name` is null or MCP calls fail:
+- Skip session tracking silently
+- Do **not** block the teaching flow
+- The student can still proceed normally
+
+## Resume Teaching Flow
+
+After session tracking, proceed to the next phase for the current chapter:
+
+- After **ACTION** phase → run **VERIFY**
+- After failed **VERIFY** → re-run **VERIFY**
+- After **CHECKPOINT** "I need more time" → resume where the student left off
+- After **CHECKLIST** → advance to the next chapter

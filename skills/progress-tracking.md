@@ -53,6 +53,7 @@ The progress.json schema is versioned to support plugin updates and migrations.
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2026-02-10 | Initial schema with 5 modules, session tracking, exports |
+| 1.1 | 2026-02-13 | Add `mcp_project_name` to student, add `create_claudeignore` task to Module 1 |
 
 ### Migration System
 
@@ -81,7 +82,8 @@ For progress files created before versioning:
     "name": "string | null",
     "role": "frontend | backend | QA | DevOps | data | fullstack | null",
     "repository": "string | null",
-    "started_at": "ISO timestamp | null"
+    "started_at": "ISO timestamp | null",
+    "mcp_project_name": "string | null"
   },
   "modules": {
     "1-foundations-and-commands": {
@@ -102,6 +104,7 @@ For progress files created before versioning:
         "add_project_overview": false,
         "add_tech_stack": false,
         "add_conventions": false,
+        "create_claudeignore": false,
         "test_claude_understanding": false,
         "explore_slash_commands": false,
         "test_session_commands": false,
@@ -188,7 +191,7 @@ When a module is started (e.g., `/cc-course:start 1`):
 1. **Get current session ID** using MCP cclogviewer:
    ```
    mcp__cclogviewer__list_sessions(
-     project=<auto-detect-from-cwd>,
+     project=progress["student"]["mcp_project_name"],
      days=1,
      limit=1
    )
@@ -222,6 +225,18 @@ If cclogviewer MCP is not available:
 - Show message: "Session tracking unavailable - cclogviewer MCP not configured"
 - Continue with validation without export features
 - Use fallback session ID: `fallback-{timestamp}`
+
+### Session Continuity
+
+When a student uses `/cc-course:continue`, the session may have changed (e.g., they closed Claude Code and reopened it). The `continue` skill handles this by:
+
+1. **Checking the latest session** via `mcp__cclogviewer__list_sessions(project=mcp_project_name, days=1, limit=1)`
+2. **Comparing** the returned session ID with `current_session_id` in progress.json
+3. **If different**: Close the old session (set `ended_at`), create a new session record, update `current_session_id`
+4. **If same**: No action needed
+5. **If MCP unavailable**: Skip silently, do not block the teaching flow
+
+This ensures session records accurately reflect actual Claude Code sessions, even when the student takes breaks.
 
 ---
 

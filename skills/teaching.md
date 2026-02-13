@@ -95,7 +95,7 @@ This is the core methodology that makes this course interactive rather than a mo
   - "I have a question" or "I need more explanation"
 - The "Other" option in AskUserQuestion allows free-text questions
 - If the student has questions: answer them, then re-ask the checkpoint
-- If the student selects "I need more time": acknowledge and wait for them to run `/cc-course:continue`
+- If the student selects "I need more time": acknowledge and wait for them to use the {cc-course:continue} Skill tool
 - NEVER skip checkpoints — they ensure the student is actually following along
 
 ### ACTION Phase Rules
@@ -104,7 +104,7 @@ This is the core methodology that makes this course interactive rather than a mo
 
 - **NEVER do the action for the student** — tell them what to do, not do it yourself
 - Give clear, specific instructions (exact commands, file paths, what to type)
-- After giving instructions, **wait for the student to run `/cc-course:continue`**
+- After giving instructions, **wait for the student to use the {cc-course:continue} Skill tool**
 - If the student says "just do it for me":
   1. Explain why doing it themselves is important for learning
   2. Offer to break it into smaller, easier steps
@@ -124,7 +124,7 @@ Run ALL listed checks before marking a task complete. Use verification methods i
 **On verification failure:**
 1. Tell the student specifically what's missing or incorrect
 2. Give guidance on how to fix it
-3. Wait for the student to run `/cc-course:continue`
+3. Wait for the student to use the {cc-course:continue} Skill tool
 4. Re-run verification
 5. Only mark complete when ALL checks pass
 
@@ -135,7 +135,7 @@ Run ALL listed checks before marking a task complete. Use verification methods i
 
 ### The `continue` Signal
 
-The student signals they're ready to proceed by running `/cc-course:continue`. This slash command reads their progress and tells the instructor where to resume. Wait for this signal:
+The student signals they're ready to proceed by using the {cc-course:continue} Skill tool. This skill reads their progress and tells the instructor where to resume. Wait for this signal:
 
 - After the **ACTION** phase (student has done the work)
 - After "I need more time" in **CHECKPOINT** (student has caught up)
@@ -230,6 +230,32 @@ The student signals they're ready to proceed by running `/cc-course:continue`. T
 - `/cc-course:validate` — Validate current module
 - `/cc-course:hint` — Get help with current task
 - `/cc-course:continue` — Signal readiness to proceed to next step
+
+---
+
+## Skill Tool Invocation Convention
+
+When instructing the student to use a course skill (like `continue`, `validate`, `hint`, `status`), **always** use Skill tool notation with curly braces. This ensures the skill is invoked via the Skill tool rather than typed as a raw slash command.
+
+### Correct (Skill tool notation)
+
+- "Use the {cc-course:continue} Skill tool when you're done."
+- "If you're stuck, use the {cc-course:hint} Skill tool."
+- "Check your progress with the {cc-course:status} Skill tool."
+- "Run the {cc-course:validate} Skill tool to verify your work."
+
+### Incorrect (raw slash command)
+
+- "Run `/cc-course:continue` when done" — may not trigger the Skill tool
+- "Type /cc-course:hint for help" — user may type it literally
+
+### Why This Matters
+
+The Skill tool has special behavior: it loads the skill's full prompt into the conversation context. A raw slash command depends on the user's terminal and may not be recognized consistently. Using `{skill-name}` notation ensures reliable invocation.
+
+### Scope
+
+This convention applies **only to course skills** (cc-course:*). Built-in Claude Code commands like `/help`, `/clear`, `/compact`, `/init`, `/doctor`, `/config`, `/context`, `/export`, `/model`, `/statusline` are always written with the `/` prefix since they are native features.
 
 ---
 
