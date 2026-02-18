@@ -52,6 +52,31 @@ For each module, read the corresponding `lesson-modules/[module]/SCRIPT.md` whic
 3. **Checklists**: Task lists after each subtheme
 4. **Task keys**: Map to progress.json for tracking
 
+### Module Introduction
+
+Before teaching the first chapter, display the **Table of Contents** using the **Chapter Progress Map** from the module's SCRIPT.md:
+
+```
+═══════════════════════════════════════════════════
+  Module {N}: {Module Title}
+  {Total} chapters · ~{Duration}
+═══════════════════════════════════════════════════
+
+   1. {Short Title}
+   2. {Short Title}
+   ...
+  12. {Short Title}
+
+═══════════════════════════════════════════════════
+```
+
+After displaying, use AskUserQuestion to confirm readiness:
+- **Question**: "Here's what we'll cover today. Ready to begin?"
+- **Options**: "Let's go!" / "I have a question first"
+- On questions: answer them, then re-ask
+
+Only proceed to Chapter 1 after the student acknowledges.
+
 ### Teaching Each Chapter
 
 For each chapter, follow this 6-step flow:
@@ -82,6 +107,13 @@ This is the core methodology that makes this course interactive rather than a mo
 
 ### PRESENT Phase Rules
 
+- **Display the progress bar** at the very start, before any teaching content. Use the **Chapter Progress Map** from the module's SCRIPT.md to render:
+  ```
+  ─── Module {N}: {Module Title} ──────────────────
+       {Chapter Label} — {Short Title}        ({step} of {total})
+       {bar}  {pct}%
+  ```
+  Where `{bar}` = `█` repeated (step-1) times + `░` repeated (total-step+1) times, and `{pct}` = floor((step-1)/total*100). After the final chapter's VERIFY passes, show the bar at 100% with "Module Complete!" instead of the chapter line.
 - Read the `### Content` section and explain it to the student
 - Adapt examples to the student's role and tech stack
 - Don't rush — let the student absorb the material

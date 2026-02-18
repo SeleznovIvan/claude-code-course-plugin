@@ -92,9 +92,47 @@ If `mcp_project_name` is null or MCP calls fail:
 - Do **not** block the teaching flow
 - The student can still proceed normally
 
+## Post-Completion Check
+
+Before resuming the teaching flow, check the current module's state:
+
+### All tasks done but module not yet validated (status is still `in_progress`)
+If all task values in `modules[current_module].tasks` are `true` but `status != "completed"`:
+
+Tell the student:
+```
+You've finished all the chapters! Time to validate your work.
+
+Run /cc-course:validate to check everything passes.
+```
+
+Do NOT resume the teaching flow — direct them to validate instead.
+
+### Module validated but no submission
+If `status == "completed"` and `submission` is null:
+
+Tell the student:
+```
+Module [N] is validated! You can optionally package your work for review.
+
+Run /cc-course:submit to create a submission archive, or /cc-course:start [N+1] to continue to the next module.
+```
+
+### Module validated and submitted
+If `status == "completed"` and `submission` is non-null:
+
+Tell the student:
+```
+Module [N] is complete and submitted!
+
+Run /cc-course:start [N+1] to begin the next module.
+```
+
+---
+
 ## Resume Teaching Flow
 
-After session tracking, proceed to the next phase for the current chapter:
+After session tracking and post-completion checks, proceed to the next phase for the current chapter:
 
 - After **ACTION** phase → run **VERIFY**
 - After failed **VERIFY** → re-run **VERIFY**

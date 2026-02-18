@@ -55,6 +55,29 @@ Quick reference showing which interactive phases each chapter has:
 
 ---
 
+## Chapter Progress Map
+
+Data for the table of contents and progress bar (see teaching.md).
+
+| Step | Chapter Label | Short Title            |
+|------|---------------|------------------------|
+| 1    | Chapter 1     | What is Claude Code?   |
+| 2    | Chapter 2     | Installation           |
+| 3    | Chapter 3     | CLI Basics             |
+| 4    | Chapter 4     | CLAUDE.md              |
+| 5    | Chapter 5     | Testing Setup          |
+| 6    | Chapter 6a    | Discovery Commands     |
+| 7    | Chapter 6b    | Understanding Context  |
+| 8    | Chapter 6c    | Context Management     |
+| 9    | Chapter 6d    | Status Line            |
+| 10   | Chapter 7     | Plan Mode              |
+| 11   | Chapter 8     | Custom Commands        |
+| 12   | Chapter 9     | Commit Your Work       |
+
+**Total steps**: 12 | **Module title**: Foundations & Commands | **Module number**: 1
+
+---
+
 ## Chapter 1: What is Claude Code?
 
 **Chapter ID**: `1.1-what-is-claude-code`
@@ -1223,7 +1246,7 @@ After Chapter 9 is complete, tell the student:
 
 **Wait for the student to run submit.**
 
-After submission completes (or if the student declines), proceed to the Seminar Summary below.
+After submission completes or if the student declines, proceed to the Seminar Summary below. Note: validation is required to unlock the next module. Submission is optional but recommended.
 
 ---
 

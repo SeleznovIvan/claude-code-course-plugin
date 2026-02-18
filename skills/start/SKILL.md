@@ -321,6 +321,23 @@ Module $ARGUMENTS is locked. Complete Module [previous] first.
 Run /cc-course:start [previous] to continue.
 ```
 
+### Module Not Validated
+If the previous module has status `in_progress` (tasks may be done but validate wasn't run):
+```
+Module $ARGUMENTS requires Module [previous] to be validated first.
+
+Run /cc-course:validate to check your work, then try again.
+```
+
+### Submission Reminder
+If the previous module is completed (validated) but has no submission (`submission` is null):
+
+Use AskUserQuestion:
+- **Question**: "You haven't submitted your work for Module [previous]. Submissions help your instructor review your progress. Continue without submitting?"
+- **Options**: "Continue without submission" / "Let me submit first"
+- On "submit first": tell them to run `/cc-course:submit [previous]`, then stop
+- On "continue": proceed normally with starting the new module
+
 ### Invalid Argument
 If $ARGUMENTS is not 1-5:
 ```

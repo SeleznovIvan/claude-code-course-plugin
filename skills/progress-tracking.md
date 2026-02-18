@@ -314,10 +314,12 @@ if all_tasks_done:
 | Module | Prerequisite |
 |--------|--------------|
 | 1-foundations-and-commands | None (always unlocked) |
-| 2-skills | Module 1 completed |
-| 3-extensions | Module 2 completed |
-| 4-agents | Module 3 completed |
-| 5-workflows | Module 4 completed |
+| 2-skills | Module 1 completed (validated) |
+| 3-extensions | Module 2 completed (validated) |
+| 4-agents | Module 3 completed (validated) |
+| 5-workflows | Module 4 completed (validated) |
+
+**Note**: "completed" means the student ran `/cc-course:validate` and all tasks passed. Submission is optional but prompted if missing when starting the next module.
 
 ---
 
