@@ -24,6 +24,23 @@ claude
 
 ---
 
+## How This Course Works
+
+This is an interactive course — Claude guides you through each chapter step by step. Here are the commands you'll use:
+
+| Command | When to Use |
+|---------|-------------|
+| `/cc-course:start N` | Begin a module (1-5) |
+| `/cc-course:continue` | Signal you're done with the current step and ready to move on |
+| `/cc-course:hint` | Get help when you're stuck on a task |
+| `/cc-course:status` | Check your overall progress across all modules |
+| `/cc-course:validate` | Verify your work at the end of a module |
+| `/cc-course:submit` | Package your completed work for instructor review |
+
+**The flow**: Claude presents a concept → checks your understanding → gives you a hands-on task → you do it → Claude verifies → repeat. Use `/cc-course:continue` to tell Claude you're ready for the next step.
+
+---
+
 ## Learning Objectives
 
 By the end of this seminar, participants will:

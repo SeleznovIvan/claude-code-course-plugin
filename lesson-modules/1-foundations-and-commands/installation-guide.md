@@ -1,4 +1,4 @@
-# Claude Code Installation Guide
+# Claude Code and Course Installation Guide
 
 **Complete this guide before starting the interactive course.**
 
@@ -137,33 +137,20 @@ claude
 
 ---
 
-## Quick Reference Card
+## Step 6: Install the Course Plugin
 
-### Starting Claude Code
+This course is delivered as a Claude Code plugin. Install it from the course repository:
 
-| Command | Description |
-|---------|-------------|
-| `claude` | Start interactive session |
-| `claude "prompt"` | One-shot mode (run and exit) |
-| `claude -p "prompt"` | Print mode (output only) |
-| `claude -c` | Continue last conversation |
-
-### Essential Commands (inside session)
-
-| Command | Description |
-|---------|-------------|
-| `/help` | Show all available commands |
-| `/doctor` | Diagnose installation issues |
-| `/clear` | Reset conversation context |
-| `exit` | End the session |
-
-### Keyboard Shortcuts
-
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl+C` | Cancel current operation |
-| `Ctrl+D` | Exit session |
-| `Shift+Tab` | Enter plan mode |
+1. Visit [Claude Code Education](https://github.com/SeleznovIvan/claude-code-education) for the full course catalog
+2. Install the plugin:
+   ```bash
+   claude plugin install github:SeleznovIvan/claude-code-course-plugin
+   ```
+3. Verify the plugin is installed:
+   ```bash
+   claude plugin list
+   ```
+   **Expected:** You should see `cc-course` in the list of installed plugins.
 
 ---
 
@@ -173,13 +160,43 @@ Once you can:
 - ✅ Run `claude --version` and see a version number
 - ✅ Start `claude` and get a response
 - ✅ Run `/doctor` with all checks passing
+- ✅ Course plugin installed
 
-You're ready to start the interactive course:
+Navigate to your project folder, run the one-time setup, and start the course:
 
 ```bash
+cd /path/to/your/project
 claude
-/cc-course:start 1
+
+# Inside Claude Code:
+/cc-course:setup       # One-time MCP server installation
+/cc-course:start 1     # Start Module 1!
 ```
+
+---
+
+## After Course Completion
+
+When you finish all modules:
+
+1. Run `/cc-course:validate` to verify your work
+2. Run `/cc-course:submit` to package your work into a zip archive
+3. Send the zip archive to **Ivan** for review
+
+The submission includes your configurations, progress data, and session logs.
+
+---
+
+## About This Course
+
+This course teaches you Claude Code by having you **build real configurations in YOUR OWN repository**. Unlike tutorials with toy examples:
+
+- Every task applies to your actual project
+- Everything you create (CLAUDE.md, custom commands, skills, hooks) stays in your repo and you keep using it
+- Claude teaches you inside Claude Code itself — you learn the tool by using the tool
+- Guidance adapts to your role (frontend, backend, QA, DevOps, data)
+
+By the end, your repository will have a complete Claude Code setup: project memory, custom commands, skills, hooks, MCP integrations, and CI/CD workflows.
 
 ---
 
