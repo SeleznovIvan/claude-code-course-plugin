@@ -226,7 +226,8 @@ Please update the plugin:
   claude plugin update cc-course
 
 Or reinstall:
-  claude plugin install github:SeleznovIvan/claude-code-course-plugin
+  claude plugin marketplace add https://github.com/SeleznovIvan/claude-code-education
+  claude plugin install cc-course@claude-code-education
 ```
 
 ---

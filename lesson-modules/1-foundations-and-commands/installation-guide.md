@@ -139,12 +139,15 @@ claude
 
 ## Step 6: Install the Course Plugin
 
-This course is delivered as a Claude Code plugin. Install it from the course repository:
+This course is delivered as a Claude Code plugin via the [Claude Code Education](https://github.com/SeleznovIvan/claude-code-education) marketplace.
 
-1. Visit [Claude Code Education](https://github.com/SeleznovIvan/claude-code-education) for the full course catalog
+1. Add the marketplace:
+   ```bash
+   claude plugin marketplace add https://github.com/SeleznovIvan/claude-code-education
+   ```
 2. Install the plugin:
    ```bash
-   claude plugin install github:SeleznovIvan/claude-code-course-plugin
+   claude plugin install cc-course@claude-code-education
    ```
 3. Verify the plugin is installed:
    ```bash

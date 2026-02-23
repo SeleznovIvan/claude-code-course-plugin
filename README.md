@@ -16,7 +16,8 @@ This is a Claude Code plugin that provides a 5-module interactive course teachin
 ### Option 1: Plugin Install (Recommended)
 
 ```bash
-claude plugin install github:SeleznovIvan/claude-code-course-plugin
+claude plugin marketplace add https://github.com/SeleznovIvan/claude-code-education
+claude plugin install cc-course@claude-code-education
 ```
 
 ### Option 2: Manual Installation
@@ -72,8 +73,9 @@ See all releases: https://github.com/SeleznovIvan/cclogviewer/releases
 Complete these steps to start the course:
 
 ```bash
-# 1. Install the plugin
-claude plugin install github:SeleznovIvan/claude-code-course-plugin
+# 1. Add the marketplace and install the plugin
+claude plugin marketplace add https://github.com/SeleznovIvan/claude-code-education
+claude plugin install cc-course@claude-code-education
 
 # 2. Start Claude Code in your project directory
 cd /path/to/your/repo

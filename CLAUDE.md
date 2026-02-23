@@ -15,7 +15,8 @@ This is a Claude Code plugin that provides a 5-module interactive course teachin
 ### Via Plugin Install (Recommended)
 
 ```bash
-claude plugin install github:SeleznovIvan/claude-code-course-plugin
+claude plugin marketplace add https://github.com/SeleznovIvan/claude-code-education
+claude plugin install cc-course@claude-code-education
 ```
 
 ### Manual Installation
