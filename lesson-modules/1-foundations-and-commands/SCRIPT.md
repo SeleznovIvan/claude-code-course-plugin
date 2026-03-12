@@ -296,7 +296,7 @@ Run this check in the student's repository:
 
 **On failure**: Tell the student what's missing. Wait for {cc-course:continue}, then re-verify.
 
-**On success**: Update progress.json task `create_claudeignore`.
+**On success**: Update progress.json: set task `create_claudeignore` to `true`, set `current_task` to `"create_claude_md"`.
 
 ### Checklist
 
@@ -494,7 +494,7 @@ Run ALL these checks in the student's repository before marking complete:
 
 **On failure**: Tell the student specifically what's missing (e.g., "Your CLAUDE.md is missing a Tech Stack section"). Wait for {cc-course:continue}, then re-verify.
 
-**On success**: Update progress.json tasks: `create_claude_md`, `add_project_overview`, `add_tech_stack`, `add_conventions`, `claude_md_quality`.
+**On success**: Update progress.json: set tasks `create_claude_md`, `add_project_overview`, `add_tech_stack`, `add_conventions`, `claude_md_quality` to `true`, set `current_task` to `"test_claude_understanding"`.
 
 ### Checklist
 
@@ -581,7 +581,7 @@ Use AskUserQuestion:
 - **Question**: "Did Claude answer your project questions accurately based on your CLAUDE.md?"
 - **Options**: "Yes, it worked well" / "I improved my CLAUDE.md and it's better now" / "Still needs work"
 - On "still needs work": guide them to add more specific info, then re-verify
-- On success: update progress.json task `test_claude_understanding`
+- On success: update progress.json: set task `test_claude_understanding` to `true`, set `current_task` to `"explore_slash_commands"`
 
 ### Checklist
 
@@ -639,7 +639,7 @@ Try to verify using MCP session search:
 1. Use `mcp__cclogviewer__search_logs` or `mcp__cclogviewer__get_session_timeline` to check if the student ran `/help`, `/doctor`, and `/config` in this session
 2. **Fallback** (if MCP is unavailable or returns no results): Use AskUserQuestion to confirm: "Did you try /help, /doctor, and /config?"
 
-On success: update progress.json task `explore_slash_commands`
+On success: update progress.json: set task `explore_slash_commands` to `true`, set `current_task` to `"test_session_commands"`
 
 ### Checklist
 
@@ -839,7 +839,7 @@ Use AskUserQuestion:
 - **Question**: "Did you configure your status line with `/statusline`?"
 - **Options**: "Yes, I configured it" / "I looked at it but kept defaults" / "I need help"
 - On "need help": walk them through the `/statusline` command step by step
-- On any success: update progress.json task `test_session_commands`
+- On any success: update progress.json: set task `test_session_commands` to `true`, set `current_task` to `"use_plan_mode"`
 
 ### Checklist
 
@@ -944,7 +944,7 @@ Use AskUserQuestion:
 - **Options**: "Yes, completed all steps" / "I got a plan but didn't iterate" / "I need to try again"
 - On "didn't iterate": invoke `EnterPlanMode` again so they can retry with 2-3 rounds of feedback, wait for {cc-course:continue}
 - On "need to try again": invoke `EnterPlanMode` again, wait for {cc-course:continue}, then re-verify
-- On success: update progress.json task `use_plan_mode`
+- On success: update progress.json: set task `use_plan_mode` to `true`, set `current_task` to `"create_custom_command"`
 
 ### Checklist
 
@@ -1144,7 +1144,7 @@ Give the student a brief review of their command — what's good, what could be 
 
 Wait for {cc-course:continue} after fixes, then re-verify.
 
-**On success**: Update progress.json tasks: `create_commands_directory`, `create_custom_command`, `valid_command_format`
+**On success**: Update progress.json: set tasks `create_commands_directory`, `create_custom_command`, `valid_command_format` to `true`, set `current_task` to `"commit_work"`
 
 ### Checklist
 
@@ -1233,7 +1233,7 @@ Run these checks:
 
 **On failure**: Tell the student what's not committed yet. Wait for {cc-course:continue}, then re-verify.
 
-**On success**: Update progress.json tasks: `commit_claude_md`, `commit_commands`
+**On success**: Update progress.json: set tasks `commit_claude_md`, `commit_commands`, `commit_work` to `true`, set `current_task` to `null`
 
 ### Checklist
 

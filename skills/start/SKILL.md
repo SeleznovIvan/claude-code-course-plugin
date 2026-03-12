@@ -286,6 +286,7 @@ When this command is invoked:
    - Append session to `modules[module].sessions`
    - Set `current_session_id`
    - Set `current_module`
+   - Set `current_task` to the first incomplete task in the module's `tasks` object (the first key with value `false`)
    - Set module `status = "in_progress"` if was `"not_started"`
 
 ## Module Mapping
