@@ -36,6 +36,7 @@
       "sessions": [],
       "tasks": {
         "create_skills_directory": false,
+        "understand_codify_workflow": false,
         "write_reference_skill": false,
         "write_action_skill": false,
         "test_skills": false,
