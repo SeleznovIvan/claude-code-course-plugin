@@ -201,6 +201,112 @@ If no session data exists at all, mark Process dimension as **N/A** and exclude 
 
 ---
 
+## Phase 3.5: Claude Code Usage Analysis & Flag Detection
+
+After analyzing session data via MCP, assess how the student used Claude Code and flag any critical issues. This phase produces **flags** that appear in the feedback report.
+
+### Flag Severity Levels
+
+- **`CRITICAL`** — Strong fraud signal or fundamental misuse. Requires instructor attention.
+- **`WARNING`** — Concerning pattern worth investigating. May have innocent explanation.
+- **`INFO`** — Minor observation worth noting for the student's improvement.
+
+### 1. False Usage / Fraud Detection
+
+Use MCP data to identify submissions that may not represent genuine learning:
+
+| Signal | Detection Method | Severity |
+|--------|-----------------|----------|
+| **Speed fraud** | `get_session_summary` → total duration < 5 minutes for any module | `CRITICAL` |
+| **Pre-scripted work** | `get_session_summary` → < 5 user messages but complete artifacts with 100+ lines | `CRITICAL` |
+| **No tool trace** | `get_tool_usage_stats` → zero Write/Edit calls but artifacts exist in submission | `CRITICAL` |
+| **Verbatim copying** | Artifact content matches SCRIPT.md examples word-for-word | `CRITICAL` |
+| **Rushed completion** | `get_session_summary` → duration < 25% of module's expected time | `WARNING` |
+| **Zero iteration** | `get_tool_usage_stats` → zero Edit calls, only Write calls for artifacts | `WARNING` |
+| **Minimal interaction** | `get_session_summary` → < 5 user messages but many tool calls | `WARNING` |
+| **Zero errors** | `get_session_errors` → 0 errors on tasks that normally produce errors | `WARNING` |
+| **Session gaps** | `get_session_timeline` → gaps > 30 minutes between actions | `INFO` |
+| **Limited tools** | `get_tool_usage_stats` → only 1-2 tool types used across session | `INFO` |
+
+### 2. Prompting Anti-Pattern Detection
+
+Analyze session logs for signs of poor Claude Code usage:
+
+**Delegation without learning**
+- `search_logs(query="just do it")` or `search_logs(query="do it for me")` or `search_logs(query="do everything")`
+- Very few user messages relative to assistant messages (student not engaging)
+- Severity: `WARNING`
+
+**No verification of output**
+- `get_session_timeline` → Write/Edit calls never followed by Read or Bash (student doesn't check results)
+- No test execution after code generation
+- Severity: `INFO`
+
+**Error ignorance**
+- `get_session_errors` + `get_session_timeline` → errors occur but next action is unrelated (student ignores errors)
+- Same error appears 3+ times without a different approach
+- Severity: `WARNING`
+
+**No plan mode usage**
+- `search_logs(query="plan")` → no results for modules where plan mode was taught (Module 1+)
+- `get_tool_usage_stats` → no plan-related tool calls in complex tasks
+- Severity: `INFO`
+
+**Hint dependency**
+- `search_logs(query="hint")` → excessive hint requests (> 5 per module)
+- Hints requested without attempting tasks first (hint call immediately after task presentation in timeline)
+- Severity: `INFO`
+
+**Prompt recycling**
+- `search_logs` → same generic prompt text appears multiple times without adaptation
+- Severity: `INFO`
+
+### 3. Learning Effectiveness Issues
+
+Patterns that suggest the student isn't learning effectively:
+
+**No exploration**
+- `get_tool_usage_stats` → no Read, Grep, or Glob calls (student never explored the codebase)
+- Only Bash and Write used throughout
+- Severity: `INFO`
+
+**No iteration**
+- `get_tool_usage_stats` → artifacts written exactly once (Write) with no subsequent Edit calls
+- Timeline shows linear progression with no back-and-forth
+- Severity: `WARNING`
+
+**Checkpoint rushing**
+- `get_session_timeline` → manual/conceptual tasks (checkpoints) completed in < 30 seconds each
+- Student confirms understanding without actual engagement
+- Severity: `WARNING`
+
+### Flags Output Section
+
+Add this section to the feedback report between **Process** and **Initiative**:
+
+```
+── Flags ────────────────────────────────────────
+
+ [CRITICAL] {description}
+            Evidence: {specific MCP data that triggered this flag}
+
+ [WARNING]  {description}
+            Evidence: {specific MCP data}
+
+ [INFO]     {description}
+            Suggestion: {what the student should do differently}
+
+ {Or: "No flags detected."}
+```
+
+Every flag MUST include:
+1. The severity level
+2. A clear, specific description of what was detected
+3. The evidence (which MCP tool returned what data)
+4. For INFO flags: a constructive suggestion
+
+---
+
 ## Phase 4: Scoring
 
 ### 5 Dimensions (1–5 each)
@@ -309,6 +415,15 @@ Output the following structured report. Be specific — cite actual content from
 
  [If N/A: "No session data available — this dimension is excluded from scoring."]
 
+── Flags ────────────────────────────────────────
+
+ {For each detected flag from Phase 3.5:}
+ [{CRITICAL|WARNING|INFO}] {description}
+   Evidence: {MCP tool and data that triggered this flag}
+   {For INFO: Suggestion: {constructive advice}}
+
+ {Or: "No flags detected."}
+
 ── Initiative ({score}/5) ───────────────────────
 
  Minimum required (from verification blocks): {count/description}
@@ -354,6 +469,99 @@ Output the following structured report. Be specific — cite actual content from
 5. **Acknowledge effort** — If session data shows genuine iteration and experimentation, acknowledge it even if the final artifacts aren't perfect.
 
 6. **Grade honestly** — A "Satisfactory" (3/5) is not a failure. Most students doing minimum required work should land here. Reserve 4-5 for genuinely good work. Don't inflate grades.
+
+### Machine-Readable Summary Line
+
+After the full report, output a single summary line for batch aggregation:
+
+```
+REVIEW_RESULT|{student_name}|{module_number}|{grade}|{weighted_score}|{flags_summary}
+```
+
+- `flags_summary` is a comma-separated list of flag keywords (e.g., `RUSHED,NO_ITERATION`) or empty if no flags
+- Examples:
+  ```
+  REVIEW_RESULT|Jane Doe|1|Good|3.8|
+  REVIEW_RESULT|John Smith|1|Satisfactory|2.9|RUSHED
+  REVIEW_RESULT|Anonymous|1|Incomplete|1.2|FRAUD,NO_ITERATION
+  ```
+
+---
+
+## Phase 6: Report Persistence
+
+Each reviewer agent is responsible for writing its own reports directly to disk. The orchestrating skill passes an `OUTPUT DIRECTORY` (`STUDENT_DIR`) to each agent — the agent creates the folder and writes all files there.
+
+### File Output Structure
+
+Each agent writes to its dedicated directory:
+
+```
+{submissions_dir}/reviews/{zip-basename-without-ext}/
+├── instructor-report.md     ← Full review: all dimensions, flags, MCP evidence (teacher only)
+├── instructor-report.pdf    ← PDF conversion
+├── student-feedback.md      ← Constructive student-facing version (no fraud flags)
+└── student-feedback.pdf     ← PDF conversion
+```
+
+### Agent Responsibilities
+
+The agent must (in order):
+1. `mkdir -p {STUDENT_DIR}`
+2. Write `instructor-report.md` using the Write tool (full review with all evidence)
+3. Write `student-feedback.md` using the Write tool (filtered student-facing version)
+4. Generate PDFs via Bash if pandoc+weasyprint are available:
+   ```bash
+   pandoc "{STUDENT_DIR}/instructor-report.md" -o "{STUDENT_DIR}/instructor-report.pdf" --pdf-engine=weasyprint
+   pandoc "{STUDENT_DIR}/student-feedback.md" -o "{STUDENT_DIR}/student-feedback.pdf" --pdf-engine=weasyprint
+   ```
+5. If pandoc/weasyprint unavailable, skip PDFs silently — .md files are the minimum deliverable
+6. Output the `REVIEW_RESULT|...` summary line as the last line of its output
+
+### Batch Summary File
+
+In batch mode, after all agents complete, write `{submissions_dir}/reviews/batch-summary.md`:
+
+```markdown
+# Batch Review Summary
+
+**Date**: {current date}
+**Submissions reviewed**: {N}
+
+## Results
+
+| Student | Module | Grade | Score | Flags |
+|---------|--------|-------|-------|-------|
+| {name}  | {N}    | {grade} | {score}/5.0 | {flags} |
+| ...     | ...    | ...   | ...   | ...   |
+
+## Distribution
+
+| Grade | Count |
+|-------|-------|
+| Excellent | {N} |
+| Good | {N} |
+| Satisfactory | {N} |
+| Needs Improvement | {N} |
+| Incomplete | {N} |
+
+## Flagged Submissions
+
+{List submissions with CRITICAL or WARNING flags for instructor attention}
+```
+
+### Student Feedback Content Rules
+
+The student-facing report must NEVER contain:
+- Fraud/suspicion language: "CRITICAL", "WARNING", "fraud", "suspicious", "cheating", "pre-scripted"
+- Raw MCP tool names, session IDs, or tool usage statistics
+- References to session logs, timeline data, or error counts
+- Anything implying the student is being monitored for dishonesty
+- Weight percentages for dimensions (just show scores)
+
+INFO-level observations should be reframed constructively:
+- Instead of: "Limited tool diversity (only Bash and Write used)"
+- Write: "Try exploring Claude Code's Read and Grep tools to understand existing code before writing — it helps produce better, more integrated solutions."
 
 ---
 
