@@ -6,3 +6,6 @@ curriculum/
 
 # Local docs
 docs/
+
+# Debug logs
+firebase-debug.log
