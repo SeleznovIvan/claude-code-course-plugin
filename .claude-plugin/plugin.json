@@ -1,6 +1,6 @@
 {
   "name": "cc-course",
-  "version": "0.10.0-alpha",
+  "version": "0.11.0-alpha",
   "description": "Interactive Claude Code developer course with 5 modules covering foundations, skills, extensions, agents, and workflows",
   "author": {
     "name": "Ivan Seleznov",
