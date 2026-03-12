@@ -329,15 +329,12 @@ This strategy works because the current session has live memory of what actually
 Anthropic publishes an official skill-creator skill in the `anthropics/skills` GitHub repository. This is a comprehensive, professionally written skill that guides Claude through the process of creating, testing, and optimizing skills.
 
 **Installation:**
-```bash
-# Add the Anthropic skills plugin
-/plugin marketplace add anthropics/skills
+1. Type `/plugins` in your Claude Code session
+2. Navigate to the **Discover** tab
+3. Search for `skill-creator` (from the `anthropics/skills` repository)
+4. Install it from the UI
 
-# Install the skill-creator from the plugin
-# (follow the interactive plugin install flow)
-```
-
-After installation, restart Claude Code — plugins load at startup, not during a session.
+After installation, restart Claude Code with `claude -c` — plugins load at startup, not during a session.
 
 **What skill-creator does:** When you invoke it (typically `/skill-creator` or by describing what you want to codify), it conducts an interview:
 

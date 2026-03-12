@@ -39,7 +39,7 @@ This is an interactive course — Claude guides you through each chapter step by
 By the end of this seminar, participants will:
 - Understand what Skills are and how they differ from CLAUDE.md and Commands
 - Know the complete SKILL.md frontmatter specification (all 10 fields)
-- Install and use Anthropic's official skill-creator from the `anthropics/skills` repository
+- Install and use Anthropic's official skill-creator via the `/plugins` Discover tab
 - Master the "do by hand first, then codify" workflow for creating high-quality skills
 - Create reference skills (coding standards, conventions)
 - Create action skills (step-by-step procedures)
@@ -313,15 +313,14 @@ Anthropic's official `skill-creator` is a comprehensive skill from the [`anthrop
 
 #### Installation
 
-Install skill-creator as a plugin:
+Install skill-creator via the plugin manager UI:
 
-```
-/plugin marketplace add anthropics/skills
-```
+1. Type `/plugins` in your Claude Code session
+2. Navigate to the **Discover** tab
+3. Search for `skill-creator` (it's part of the `anthropics/skills` repository)
+4. Install it from the UI
 
-Then install the `example-skills@anthropic-agent-skills` plugin (which includes skill-creator).
-
-> ⚠️ **Important**: Plugins load at Claude startup. After installing, you must **restart Claude** for skill-creator to become available.
+> ⚠️ **Important**: Plugins load at Claude startup. After installing, you must **restart Claude** with `claude -c` (to continue the session) for skill-creator to become available.
 
 ### Instructor: Checkpoint
 
@@ -334,13 +333,12 @@ Ask the student using AskUserQuestion:
 ### Instructor: Action (Part A — Install)
 
 Tell the student:
-"Let's install Anthropic's official skill-creator. Run this command:
+"Let's install Anthropic's official skill-creator. Follow these steps:
 
-```
-/plugin marketplace add anthropics/skills
-```
-
-Then install the plugin that includes skill-creator: select `example-skills@anthropic-agent-skills`.
+1. Type `/plugins` to open the plugin manager
+2. Navigate to the **Discover** tab
+3. Search for `skill-creator` (it's part of the `anthropics/skills` repository)
+4. Install it from the UI
 
 Use the {cc-course:continue} Skill tool when you've completed the installation."
 
@@ -359,7 +357,7 @@ Tell the student:
 
 **Steps:**
 1. Type `exit` to leave Claude
-2. Start Claude again with `claude`
+2. Start Claude again with `claude -c` to continue this session
 3. Run `/cc-course:continue` to resume the course right where we left off
 
 Your progress is saved — the course will pick up at this exact point."
@@ -370,14 +368,52 @@ Your progress is saved — the course will pick up at this exact point."
 
 After the student returns via `/cc-course:continue`:
 
-1. **Verify skill-creator is available**: Ask Claude "What skills are available?" or have the student run `/context` to check if skill-creator appears in the loaded skills.
+1. **Verify skill-creator is installed**: Ask the student to check:
+   - Type `/plugins` → go to the **Installed** tab — skill-creator should appear in the list
+   - Or run `/context` — skill-creator should appear in the loaded context
    - If skill-creator appears → proceed
-   - If not → troubleshoot: check plugin installation with `/plugin list`, re-install if needed
+   - If not → troubleshoot: re-open `/plugins` → Discover, search and install again, then restart with `claude -c`
 
-2. **Practice the codify workflow**:
+2. **Discover a practice task from session history**:
 
-Tell the student:
-"Now let's practice the 'winning strategy'. Pick a small, real task from your project — something you do regularly. For example:
+Before asking the student to pick a task, analyze their recent Claude Code sessions to find repeatable patterns worth codifying.
+
+**Use cclogviewer MCP tools** (read `student.mcp_project_name` from progress.json for the `project` parameter):
+
+```
+# Get recent sessions
+mcp__cclogviewer__list_sessions(project=<project_name>, days=30, limit=10)
+
+# Get tool usage patterns
+mcp__cclogviewer__get_tool_usage_stats(project=<project_name>, days=30)
+
+# Search for repeated task patterns
+mcp__cclogviewer__search_logs(project=<project_name>, query="create|add|setup|fix|update")
+
+# Optionally get timeline for the most active sessions
+mcp__cclogviewer__get_session_timeline(session_id=<id>, project=<project_name>)
+```
+
+**Analyze the results** for:
+- Tasks that appear across multiple sessions (repeated workflows)
+- Frequently used tool sequences (e.g., Read → Edit → Bash patterns)
+- Common prompts or request types
+- Recurring file types or directories being modified
+
+**Present 3-5 discovered patterns** to the student via AskUserQuestion:
+
+"Based on your recent Claude Code sessions, here are repeatable patterns I found that would make great practice skills:
+
+1. **[Pattern Name]** — [Description]. Found in [N] sessions. [Why it would make a good skill].
+2. **[Pattern Name]** — [Description]. Found in [N] sessions. [Why it would make a good skill].
+3. **[Pattern Name]** — [Description]. Found in [N] sessions. [Why it would make a good skill].
+
+Which one would you like to work with?"
+
+- **Options**: The discovered patterns + "I have my own idea"
+- If the student picks their own idea, proceed with that
+
+**Fallback** — if cclogviewer MCP is unavailable, the project has no session history, or no meaningful patterns are found, fall back to role-based suggestions:
 
 | Role | Micro-Task Ideas |
 |------|-----------------|
@@ -387,11 +423,16 @@ Tell the student:
 | DevOps | Add a new environment variable |
 | Data | Create a data validation check |
 
+3. **Practice the codify workflow**:
+
+Tell the student:
+"Now let's practice the 'winning strategy' with your chosen task.
+
 **Step 1**: Do the task interactively with me right now. Just ask me to help you do it.
 
 **Step 2**: After we finish, I'll use skill-creator to turn what we did into a reusable skill.
 
-What task would you like to work on? Pick something small that takes less than 5 minutes."
+Let's get started — describe what you need and I'll help you do it."
 
 **Guide the student through their chosen micro-task interactively.**
 
@@ -420,7 +461,7 @@ Run these checks in the student's repository:
 
 **On failure**: Tell the student what's missing. Wait for {cc-course:continue}, then re-verify.
 
-**On success**: Update progress.json tasks: `create_skills_directory`, `understand_codify_workflow`
+**On success**: Update progress.json: set tasks `create_skills_directory`, `understand_codify_workflow` to `true`, set `current_task` to `"write_reference_skill"`
 
 ### Verification
 
@@ -439,7 +480,7 @@ verification:
 ### Checklist
 
 - [ ] Understand the "winning strategy" (do by hand → codify)
-- [ ] Installed skill-creator plugin from `anthropics/skills`
+- [ ] Installed skill-creator plugin via `/plugins` → Discover
 - [ ] Restarted Claude and verified skill-creator is available
 - [ ] Completed a micro-task interactively
 - [ ] Used skill-creator to codify the task into a SKILL.md
@@ -498,19 +539,59 @@ Ask the student using AskUserQuestion:
 
 ### Instructor: Action
 
-Tell the student:
-"Now create a reference skill for your project using the codify workflow:
+#### Discover conventions from session history
 
-**Step 1**: Let's discuss your team's standards. Tell me about:
-- Your naming conventions (files, variables, functions)
-- Your code style preferences
-- Any patterns that are unique to your project
+Before asking the student to discuss conventions, analyze their recent sessions to find standards and conventions they already apply.
+
+**Use cclogviewer MCP tools** (read `student.mcp_project_name` from progress.json for the `project` parameter):
+
+```
+# Search for convention/standard-related patterns
+mcp__cclogviewer__search_logs(project=<project_name>, query="convention|standard|naming|style|pattern|format")
+
+# Get tool usage to see what file types and directories are commonly touched
+mcp__cclogviewer__get_tool_usage_stats(project=<project_name>, days=30)
+
+# Get recent sessions for context
+mcp__cclogviewer__list_sessions(project=<project_name>, days=30, limit=10)
+```
+
+**Analyze the results** for:
+- Coding style corrections or naming pattern enforcement in past sessions
+- Recurring file structures or directory conventions
+- Patterns the student applied consistently (e.g., always adding tests, always using specific naming)
+- Conventions discussed or enforced in CLAUDE.md or code reviews
+
+**Present 3-5 discovered convention areas** to the student via AskUserQuestion:
+
+"Based on your recent Claude Code sessions, here are convention areas I found that would make great reference skills:
+
+1. **[Convention Area]** — [Description]. I noticed [evidence from sessions]. [Why it would make a good reference skill].
+2. **[Convention Area]** — [Description]. I noticed [evidence]. [Why it would be valuable].
+3. **[Convention Area]** — [Description]. I noticed [evidence]. [Why this matters].
+
+Which convention area would you like to codify into a reference skill?"
+
+- **Options**: The discovered areas + "I have my own idea"
+- If the student picks their own, proceed with that
+
+**Fallback** — if cclogviewer MCP is unavailable or no meaningful conventions are found, ask the student directly about their team's standards (naming conventions, code style, project-specific patterns).
+
+#### Create the reference skill
+
+Tell the student:
+"Now let's create a reference skill for your project using the codify workflow:
+
+**Step 1**: Let's discuss your [chosen convention area]. Tell me about:
+- What rules or patterns you follow
+- Any exceptions or edge cases
+- How you want Claude to apply these conventions
 
 Just describe them naturally — we'll iterate together.
 
 **Step 2**: Once we've agreed on the standards, I'll use skill-creator to codify them into a proper reference skill.
 
-Start by telling me about your most important coding conventions."
+Start by telling me about this convention in detail."
 
 **Guide the student through a discussion of their standards. Ask clarifying questions. Iterate.**
 
@@ -533,7 +614,7 @@ Run these checks:
 
 **On failure**: Tell the student what's missing. Wait for {cc-course:continue}, then re-verify.
 
-**On success**: Update progress.json task: `write_reference_skill`
+**On success**: Update progress.json: set task `write_reference_skill` to `true`, set `current_task` to `"write_action_skill"`
 
 ### Verification
 
@@ -618,10 +699,45 @@ Ask the student using AskUserQuestion:
 
 ### Instructor: Action
 
-Tell the student:
-"Now create an action skill using the codify workflow:
+#### Discover procedural patterns from session history
 
-**Step 1**: Pick a task you do regularly that involves multiple steps. For example:
+Before asking the student to pick a task, analyze their recent sessions to find multi-step procedures they repeat.
+
+**Use cclogviewer MCP tools** (read `student.mcp_project_name` from progress.json for the `project` parameter):
+
+```
+# Search for procedural/creation patterns
+mcp__cclogviewer__search_logs(project=<project_name>, query="create|scaffold|generate|deploy|migrate|setup")
+
+# Get tool usage to find multi-step workflows
+mcp__cclogviewer__get_tool_usage_stats(project=<project_name>, days=30)
+
+# Get timelines for active sessions to spot repeated sequences
+mcp__cclogviewer__list_sessions(project=<project_name>, days=30, limit=10)
+# Then for the most active sessions:
+mcp__cclogviewer__get_session_timeline(session_id=<id>, project=<project_name>)
+```
+
+**Analyze the results** for:
+- Multi-step workflows that appear across sessions (e.g., create file → add boilerplate → register → add test)
+- Tool chains that repeat (e.g., Write → Edit → Bash sequences)
+- Sessions where multiple files were created/modified in a consistent sequence
+- Tasks involving scaffolding, configuration, or setup steps
+
+**Present 3-5 discovered procedures** to the student via AskUserQuestion:
+
+"Based on your recent Claude Code sessions, here are multi-step workflows I found that would make great action skills:
+
+1. **[Procedure Name]** — [Description]. Found in [N] sessions. [Why automating this as a skill saves time].
+2. **[Procedure Name]** — [Description]. Found in [N] sessions. [Why this is a good candidate].
+3. **[Procedure Name]** — [Description]. Found in [N] sessions. [What makes this repeatable].
+
+Which procedure would you like to codify into an action skill?"
+
+- **Options**: The discovered procedures + "I have my own idea"
+- If the student picks their own, proceed with that
+
+**Fallback** — if cclogviewer MCP is unavailable or no meaningful procedures are found, fall back to role-based suggestions:
 
 | Role | Suggested Task |
 |------|---------------|
@@ -631,11 +747,16 @@ Tell the student:
 | DevOps | Add a new service configuration |
 | Data | Create a new data pipeline stage |
 
-**Step 2**: Ask me to help you do the task right now — for real, in your project.
+#### Create the action skill
 
-**Step 3**: After we finish, I'll codify it into an action skill.
+Tell the student:
+"Now let's create an action skill using the codify workflow:
 
-What task would you like to work on?"
+**Step 1**: Let's do the task — I'll help you perform [chosen procedure] right now, for real, in your project.
+
+**Step 2**: After we finish, I'll codify it into a reusable action skill.
+
+Let's get started — describe what you need and I'll help."
 
 **Guide the student through their chosen task interactively. Do the actual work.**
 
@@ -661,7 +782,7 @@ Run these checks:
 
 **On failure**: Tell the student what's missing. Wait for {cc-course:continue}, then re-verify.
 
-**On success**: Update progress.json task: `write_action_skill`
+**On success**: Update progress.json: set task `write_action_skill` to `true`, set `current_task` to `"test_skills"`
 
 ### Verification
 
@@ -785,7 +906,7 @@ For any skills that need work:
 3. Have them test again in a fresh session
 4. Repeat until satisfied
 
-**On success** (student confirms skills work): Update progress.json task: `test_skills`
+**On success** (student confirms skills work): Update progress.json: set task `test_skills` to `true`, set `current_task` to `"commit_skills"`
 
 ### Verification
 
@@ -1000,7 +1121,7 @@ Run these checks:
 
 **On failure**: Tell the student what's not committed yet. Wait for {cc-course:continue}, then re-verify.
 
-**On success**: Update progress.json task: `commit_skills`
+**On success**: Update progress.json: set task `commit_skills` to `true`, set `current_task` to `null`
 
 ### Verification
 
