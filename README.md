@@ -96,9 +96,11 @@ That's it! Claude will guide you from there.
 |---------|-------------|
 | `/cc-course:setup` | Install the required MCP server (run once after installation) |
 | `/cc-course:start 1` to `/cc-course:start 5` | Begin a specific module |
+| `/cc-course:continue` | Signal you've completed the current step and are ready to proceed |
 | `/cc-course:status` | See your progress |
 | `/cc-course:validate` | Check if current module is complete |
 | `/cc-course:hint` | Get help with current task |
+| `/cc-course:submit` | Package completed work for instructor review |
 
 ## Course Structure
 
@@ -135,10 +137,10 @@ Your repository will be equipped with:
 
 ```
 your-repo/
-├── CLAUDE.md                    # Project context and memory
+├── CLAUDE.md                    # Project context, conventions, agent patterns, workflows
+├── .mcp.json                    # MCP server configurations
 ├── .claude/
-│   ├── settings.json            # Hook configurations
-│   ├── mcp.json                 # External tool integrations
+│   ├── settings.json            # Permissions, hooks, security config
 │   ├── skills/                  # Custom team standards and procedures
 │   └── commands/                # Custom slash commands
 ├── .github/workflows/
@@ -177,8 +179,8 @@ The plugin is configured via `.claude-plugin/plugin.json`:
 ```json
 {
   "name": "cc-course",
-  "version": "1.0.0",
-  "description": "Interactive Claude Code developer course",
+  "version": "0.12.0-alpha",
+  "description": "Interactive Claude Code developer course with 5 modules",
   "skills": "./skills/",
   "mcpServers": "./.mcp.json"
 }
@@ -272,17 +274,16 @@ If `/cc-course:*` commands don't appear:
 
 ## Course Architecture
 
-Each module has a detailed teaching script in `lesson-modules/[module]/SCRIPT.md` containing:
+Each module has two files in `lesson-modules/[module]/`:
 
-- **Chapters**: Sequential learning content
-- **Verification blocks**: YAML criteria for checking completion
-- **Checklists**: Task lists after each subtheme
-- **Task keys**: Mapping to progress.json for tracking
+- **`SCRIPT.md`** — The teaching script with chapters, interactive checkpoints, verification blocks, and task tracking
+- **`KNOWLEDGE.md`** — Deep dive companion with detailed explanations and external resource links
 
-This structure allows Claude to:
-- Verify what was done
-- Explain content systematically
-- Track granular progress
+The SCRIPT.md contains:
+- **Chapters**: Sequential content with PRESENT → CHECKPOINT → ACTION → VERIFY flow
+- **Verification blocks**: YAML criteria for automated/manual checking
+- **cclogviewer discovery**: MCP queries to personalize tasks based on student's session history
+- **Task keys**: Mapping to progress.json for granular tracking
 
 ## Adapting This Course
 

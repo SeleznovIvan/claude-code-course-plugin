@@ -151,43 +151,60 @@ When Claude uses tools, you'll see indicators:
 - `Ctrl+C` — Cancel current operation (once)
 - `Ctrl+C` twice — Hard exit
 
-#### Security: .claudeignore
+#### Security: Protecting Sensitive Files
 
-The `.claudeignore` file controls which files Claude Code is **not allowed to read**. This is critical for security because Claude Code has full filesystem access within your project.
+Claude Code has full filesystem access within your project. Protecting sensitive files requires a layered approach using the official mechanisms documented at [code.claude.com/docs/en/permissions](https://code.claude.com/docs/en/permissions).
 
-**How it works:**
-- Uses the same glob pattern syntax as `.gitignore`
-- Placed in the project root
-- Claude Code checks this file before reading any file
-- Matched files are completely invisible to Claude — it cannot read, reference, or suggest changes to them
+**Layer 1: `permissions.deny` in `.claude/settings.json`** (Primary)
 
-**Important distinction from .gitignore:**
-- `.gitignore` prevents files from being tracked by git
-- `.claudeignore` prevents files from being read by Claude Code
-- A file in `.gitignore` is still readable by Claude unless also in `.claudeignore`
-- Both files should include secrets and credentials
+The official way to block Claude from reading sensitive files. Uses [gitignore pattern syntax](https://code.claude.com/docs/en/permissions#read-and-edit):
 
-**Recommended patterns:**
-```
-# Secrets and credentials
-.env
-.env.*
-*.pem
-*.key
-credentials.json
-service-account*.json
-**/secrets/**
-
-# Package manager auth tokens
-.npmrc
-.pypirc
+```json
+{
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)",
+      "Read(./*.pem)",
+      "Read(./*.key)",
+      "Read(./credentials.json)"
+    ]
+  }
+}
 ```
 
-**When to add more patterns:**
-- Private keys or certificates (`*.pfx`, `*.p12`)
-- Local override configs with passwords (`docker-compose.override.yml`)
-- Database dumps or seed files with real data
-- Any file containing API keys, tokens, or passwords
+**Pattern types:**
+| Pattern | Meaning | Example |
+|---------|---------|---------|
+| `Read(./.env)` | Relative to current directory | `.env` in project root |
+| `Read(./secrets/**)` | Recursive glob | Everything under `secrets/` |
+| `Read(~/.ssh/*)` | Home directory path | SSH keys |
+| `Read(//.env)` | Absolute path (double slash prefix) | Filesystem root |
+
+**Important caveat**: Read deny rules block Claude's built-in Read tool but do NOT prevent `cat .env` via Bash. For full protection, also use the sandbox.
+
+**Layer 2: Sandbox** (OS-level enforcement)
+
+Enable with `/sandbox` to get filesystem and network isolation that also blocks Bash subprocesses from accessing denied files. This is the strongest protection layer.
+
+**Layer 3: PreToolUse hooks** (Automated enforcement, covered in Module 3)
+
+Hooks can intercept tool calls before execution, validate the target file, and block with exit code 2 if it matches a sensitive pattern. The stderr message feeds back to Claude explaining why the read was blocked.
+
+**Security layers comparison:**
+| Layer | Blocks Read tool | Blocks Bash `cat` | Setup |
+|-------|-----------------|-------------------|-------|
+| `permissions.deny` | Yes | No | `.claude/settings.json` |
+| Sandbox | Yes | Yes | `/sandbox` command |
+| PreToolUse hook | Yes | No | Hook config in settings |
+
+**Best practices:**
+- Always configure `permissions.deny` for `.env*`, `*.pem`, `*.key` patterns
+- Enable sandbox for full protection in sensitive environments
+- Add `.env*` to `.gitignore` as well (defense-in-depth)
+- Use `${API_KEY}` interpolation in MCP configs instead of hardcoded values
+- Commit `.env.example` (no real values) as a template for teammates
 
 ### External Resources
 
@@ -436,7 +453,7 @@ The status line provides persistent, at-a-glance information while you work. Con
 
 | Flag | Long Form | Purpose |
 |------|-----------|---------|
-| `-p` | `--print` | Output only, no interactive |
+| `-p` | `--prompt` | Run non-interactively with a prompt |
 | `-c` | `--continue` | Resume last session |
 | `-r` | `--resume` | Resume specific session by ID |
 | `--max-turns N` | — | Limit agentic iterations |

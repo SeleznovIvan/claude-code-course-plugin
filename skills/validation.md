@@ -93,6 +93,8 @@ verification:
 **Check**: Ask the user to confirm they completed the task.
 **Result**: PASS if user confirms, PENDING if not yet asked.
 
+> **IMPORTANT**: For manual checks, if the student reports the task **failed** or **didn't work**, do NOT mark it as PASS. Instead: diagnose the issue, troubleshoot, and only mark PASS after the student either succeeds or explicitly agrees to move on after understanding the concept (see teaching.md "Learner reports a task didn't work").
+
 ---
 
 ## CLAUDE.md Quality Checks

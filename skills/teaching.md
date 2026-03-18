@@ -225,6 +225,19 @@ The student signals they're ready to proceed by using the {cc-course:continue} S
 3. If they insist, mark as skipped (not completed)
 4. Note: Skipped tasks may cause issues in later modules
 
+### Learner reports a task didn't work
+**NEVER mark a task as `true` just to move on.** This creates a false sense of progress.
+
+1. **Diagnose**: Ask what happened, what error they saw, what they tried
+2. **Troubleshoot**: Walk through the debugging checklist for that feature
+3. **Try alternatives**: Suggest a different approach or workaround
+4. **Only after exhausting options**: If the feature genuinely doesn't work in their environment (version mismatch, OS limitation, etc.):
+   - Explain the limitation clearly
+   - Confirm the student understands the concept even if the tool didn't work
+   - Get their explicit agreement to move on
+   - Then mark as `true` with a note that the concept was understood even if the tool had issues
+5. **NEVER** proactively offer "let's just mark it as done and move on"
+
 ### Learner's repo is unusual
 1. Adapt examples to their stack
 2. If something doesn't apply, explain why and offer alternative

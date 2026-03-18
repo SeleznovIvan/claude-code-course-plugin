@@ -216,72 +216,125 @@ Ask the student using AskUserQuestion:
 - **Options**: "Yes, clear" / "Can you explain the difference again?"
 - On "explain again": clarify that interactive is for back-and-forth, one-shot runs and exits, print mode outputs text only (useful for scripts/piping)
 
-### Security: Creating .claudeignore
+### Security: Protecting Sensitive Files
 
-#### Why .claudeignore Matters
+#### Why This Matters
 
-Claude Code can read any file in your project. A `.claudeignore` file tells Claude which files to **never read or reference**, protecting sensitive data like API keys, certificates, and credentials.
+Claude Code can read any file in your project. Without protection, it could read `.env` files containing API keys, certificates, or credentials. Claude Code provides several layers of security to prevent this.
 
-It works like `.gitignore` — pattern-based file exclusion — but specifically for Claude Code's file access.
+#### Layer 1: `permissions.deny` in `.claude/settings.json` (Primary)
 
-#### Recommended .claudeignore Contents
+The official way to block Claude from reading sensitive files is `permissions.deny` in your project's `.claude/settings.json`. Rules follow [gitignore pattern syntax](https://code.claude.com/docs/en/permissions#read-and-edit):
 
+```json
+{
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)",
+      "Read(./*.pem)",
+      "Read(./*.key)",
+      "Read(./credentials.json)",
+      "Read(./service-account*.json)"
+    ]
+  }
+}
 ```
-# Secrets and credentials
-.env
-.env.*
-*.pem
-*.key
-credentials.json
-service-account*.json
-**/secrets/**
 
-# Package manager auth
-.npmrc
-.pypirc
+**Pattern reference:**
+
+| Pattern | Matches |
+|---------|---------|
+| `Read(./.env)` | `.env` in project root |
+| `Read(./.env.*)` | `.env.local`, `.env.production`, etc. |
+| `Read(./secrets/**)` | Everything under `secrets/` recursively |
+| `Read(./*.pem)` | All `.pem` files in project root |
+| `Read(~/.ssh/*)` | SSH keys in home directory |
+
+> **Important caveat**: `Read` deny rules block Claude's built-in Read tool but do NOT prevent `cat .env` via Bash. For full protection, also enable sandboxing (Layer 2).
+
+#### Layer 2: Sandbox (OS-Level Enforcement)
+
+The sandbox provides filesystem and network isolation that also blocks Bash subprocesses:
+
+- Enable with `/sandbox` command in a session
+- Restricts what files Bash commands can access
+- Combines with `permissions.deny` for defense-in-depth
+
+#### Layer 3: PreToolUse Hooks (Automated, Module 3 Preview)
+
+In Module 3, you'll learn hooks — event-driven automation. A `PreToolUse` hook can automatically block reads with feedback to Claude:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [{
+          "type": "command",
+          "command": "if echo $INPUT | jq -r '.tool_input.file_path' | grep -qE '\\.(env|pem|key)$'; then echo 'Blocked: sensitive file' >&2; exit 2; fi"
+        }]
+      }
+    ]
+  }
+}
 ```
 
-#### .claudeignore vs .gitignore
+#### Security Layers Comparison
 
-| Feature | .claudeignore | .gitignore |
-|---------|--------------|------------|
-| **Scope** | Claude Code file access | Git tracking |
-| **Purpose** | Prevent AI from reading sensitive files | Prevent committing files |
-| **Location** | Project root | Project root |
-| **Overlap** | Should include secrets even if in .gitignore | Doesn't affect Claude |
+| Layer | Blocks Read tool | Blocks `cat` via Bash | Setup |
+|-------|-----------------|----------------------|-------|
+| `permissions.deny` | Yes | No | `.claude/settings.json` |
+| Sandbox (`/sandbox`) | Yes | Yes | Enable in session |
+| PreToolUse hook | Yes | No | `.claude/settings.json` (Module 3) |
+| `.gitignore` | No | No | Git only — doesn't affect Claude |
 
-**Key insight**: Even if a file is in `.gitignore`, Claude can still read it unless it's also in `.claudeignore`. Always add secrets to both.
+**Recommended**: Always configure `permissions.deny` for sensitive file patterns. Enable sandbox for additional Bash-level protection.
+
+#### `.env` Best Practices
+
+- Never hardcode secrets in source files
+- Use `${API_KEY}` interpolation in MCP configs (Module 3)
+- Add `.env*` to `.gitignore`
+- Commit `.env.example` (no real values) as a template for the team
+- For CI/CD: use GitHub Secrets, not env files
 
 ### Verification
 
 ```yaml
-chapter: 1.3-claudeignore
+chapter: 1.3-security
 type: automated
 verification:
   checks:
-    - file_exists: ".claudeignore"
+    - file_exists: ".claude/settings.json"
+      contains: "deny"
       task_key: create_claudeignore
 ```
 
 ### Instructor: Action
 
 Tell the student:
-"Before we set up your project memory, let's secure your project first. Create a `.claudeignore` file in your repository root to protect sensitive files from being read by Claude Code.
+"Before we set up your project memory, let's secure your project first. We'll add `permissions.deny` rules to your `.claude/settings.json` to prevent Claude from reading sensitive files.
 
-Create the file at `.claudeignore` (in your project root) with at least these patterns:
-```
-.env
-.env.*
-*.pem
-*.key
-credentials.json
-service-account*.json
-**/secrets/**
-.npmrc
-.pypirc
+Create or update `.claude/settings.json` in your repository with deny rules for sensitive file patterns:
+
+```json
+{
+  \"permissions\": {
+    \"deny\": [
+      \"Read(./.env)\",
+      \"Read(./.env.*)\",
+      \"Read(./secrets/**)\",
+      \"Read(./*.pem)\",
+      \"Read(./*.key)\"
+    ]
+  }
+}
 ```
 
-You can add more patterns specific to your project (e.g., `*.pfx`, `docker-compose.override.yml`, local config files).
+Add any additional patterns specific to your project (e.g., `Read(./credentials.json)`, `Read(./docker-compose.override.yml)`).
 
 Create the file now and use the {cc-course:continue} Skill tool when done."
 
@@ -291,8 +344,8 @@ Create the file now and use the {cc-course:continue} Skill tool when done."
 
 Run this check in the student's repository:
 
-1. **file_exists**: Use Glob to check `.claudeignore` exists in the repo root
-2. **content_check**: Use Read to verify it contains at least `.env` and `*.key` patterns
+1. **file_exists**: Use Glob to check `.claude/settings.json` exists
+2. **content_check**: Use Read to verify it contains `"deny"` with at least one `Read(` pattern
 
 **On failure**: Tell the student what's missing. Wait for {cc-course:continue}, then re-verify.
 
@@ -304,7 +357,7 @@ Run this check in the student's repository:
 - [ ] Understand difference between `claude`, `claude "prompt"`, and `claude -p`
 - [ ] Know how to exit a session (`exit` or Ctrl+D)
 - [ ] Understand what Claude shows when using tools
-- [ ] Created `.claudeignore` to protect sensitive files
+- [ ] Configured `permissions.deny` in `.claude/settings.json` to protect sensitive files
 
 ---
 
@@ -372,6 +425,15 @@ This auto-generates a CLAUDE.md based on your codebase.
 - [Key business logic locations]
 - [Sensitive areas]
 ```
+
+#### How CLAUDE.md Loading Works
+
+Understanding what gets loaded and when helps you keep context lean:
+
+- **CLAUDE.md** is always loaded at session start — its full content counts against your context budget
+- **Files referenced by path** in CLAUDE.md (e.g., "See `.claude/rules/design.md` for design specs") are **NOT auto-loaded**. Claude must explicitly Read them when needed.
+- **Skills descriptions** from `.claude/skills/*/SKILL.md` are auto-loaded (just the `description` field, not full content)
+- **Best practice**: Keep CLAUDE.md under 500 lines. Put detailed content in supporting files that Claude reads on-demand when relevant.
 
 #### Role-Specific Additions
 
@@ -766,21 +828,29 @@ Ask the student using AskUserQuestion:
 
 ### Instructor: Action
 
+> **IMPORTANT**: Before the student runs `/clear`, save progress to progress.json:
+> - `current_module`: `"1-foundations-and-commands"`
+> - `current_task`: `"test_session_commands"`
+
 Tell the student:
 "Let's experience `/clear` firsthand — this will demonstrate that your CLAUDE.md and course state survive a full reset.
 
-Run `/clear` now. After the reset, use the {cc-course:continue} Skill tool to resume the course.
+**Steps:**
+1. Run `/clear` now — this wipes the conversation context
+2. **Immediately** after the reset, use the {cc-course:continue} Skill tool to resume the course
 
-(Don't worry — the course tracks your progress in files, not in conversation memory. Everything will pick up right where you left off.)"
+The course tracks your progress in `progress.json` on disk, not in conversation memory. After `/clear`, Claude reloads CLAUDE.md automatically and the course picks up right where you left off."
 
 **Wait for the student to use the {cc-course:continue} Skill tool.**
 
 ### Instructor: Verify
 
+After the student returns via {cc-course:continue}, ask a simple confirmation. Do NOT re-run `/context` or loop back to earlier steps — the student just cleared context and doesn't have prior conversation history.
+
 Use AskUserQuestion:
-- **Question**: "Did you run `/clear`? Did the course resume correctly afterward?"
-- **Options**: "Yes, it worked — course resumed fine" / "I ran /clear but had issues" / "I didn't run /clear"
-- On "had issues": troubleshoot — progress.json should persist, CLAUDE.md should reload
+- **Question**: "Welcome back! Did `/clear` work? The key takeaway is: conversation history is gone, but CLAUDE.md reloads and your course progress survived because it's stored on disk."
+- **Options**: "Yes, it worked — makes sense" / "I had issues resuming" / "I didn't run /clear"
+- On "had issues": check that progress.json exists and has correct `current_module`. If CLAUDE.md didn't reload, suggest running `/init` to re-initialize.
 - On "didn't run /clear": encourage them to try it — it's safe and demonstrates an important concept
 - Do NOT update any task key yet — verified together with 6d
 
@@ -837,14 +907,15 @@ Run `/statusline` now and use the {cc-course:continue} Skill tool when you've co
 
 Use AskUserQuestion:
 - **Question**: "Did you configure your status line with `/statusline`?"
-- **Options**: "Yes, I configured it" / "I looked at it but kept defaults" / "I need help"
+- **Options**: "Yes, I configured it" / "I looked at it but kept defaults" / "It's not working or I don't see it" / "I need help"
 - On "need help": walk them through the `/statusline` command step by step
-- On any success: update progress.json: set task `test_session_commands` to `true`, set `current_task` to `"use_plan_mode"`
+- On "not working": "The status line feature depends on your terminal and Claude Code version. If `/statusline` doesn't respond or nothing appears in the status bar, that's OK — it's a nice-to-have convenience feature, not essential. The key concept is that Claude Code CAN show session info in the status bar. Let's move on."
+- On any response (including "not working"): update progress.json: set task `test_session_commands` to `true`, set `current_task` to `"use_plan_mode"`
 
 ### Checklist
 
-- [ ] Ran `/statusline`
-- [ ] Configured at least context % in the status bar
+- [ ] Ran `/statusline` (or attempted it)
+- [ ] Understand what the status line shows (context %, model, branch)
 - [ ] Understand when the status line is useful
 
 ---
@@ -1054,6 +1125,8 @@ description: Review current changes against team standards
 
 Usage: just type `/review` — Claude reads the diff and runs the checklist every time.
 
+> ⚠️ **Important**: Custom commands load at session start. After creating a new command file, you must **start a new Claude session** for it to appear in `/help` and be invokable. Type `exit` then `claude` to restart.
+
 ### Practice Exercise
 
 1. Create the commands directory: `mkdir -p .claude/commands`
@@ -1170,7 +1243,6 @@ After completing this seminar, you should have:
 
 ```
 your-repo/
-├── .claudeignore          # Security: sensitive file exclusions
 ├── CLAUDE.md              # Project memory file
 └── .claude/
     └── commands/
@@ -1181,7 +1253,7 @@ your-repo/
 
 ```bash
 # Stage your files
-git add .claudeignore CLAUDE.md .claude/
+git add CLAUDE.md .claude/
 
 # Commit with descriptive message
 git commit -m "Add Claude Code configuration
@@ -1281,7 +1353,7 @@ After submission completes or if the student declines, proceed to the Seminar Su
 
 | File | Purpose |
 |------|---------|
-| `.claudeignore` | Security: excludes sensitive files from Claude |
+| `.claude/settings.json` | Security: `permissions.deny` for sensitive files |
 | `CLAUDE.md` | Project context and memory |
 | `.claude/commands/*.md` | Custom slash commands |
 
@@ -1347,7 +1419,7 @@ tasks:
   create_claudeignore:
     chapter: 1.3
     type: automated
-    check: "file_exists:.claudeignore"
+    check: "file_contains:.claude/settings.json:deny"
 
   create_claude_md:
     chapter: 1.4
