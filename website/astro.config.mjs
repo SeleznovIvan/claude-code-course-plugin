@@ -5,7 +5,7 @@ import starlight from '@astrojs/starlight';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://seleznovivan.github.io',
-	base: '/claude-code-course',
+	base: '/claude-code-course-plugin',
 	integrations: [
 		starlight({
 			title: 'Claude Code Course',
