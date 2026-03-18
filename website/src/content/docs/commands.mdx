@@ -1,0 +1,181 @@
+---
+title: Course Commands
+description: Complete reference for all Claude Code Course slash commands.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+All course commands use the `/cc-course:` namespace. Type any command inside a Claude Code session to use it.
+
+## Command Reference
+
+| Command | Arguments | Description |
+|---------|-----------|-------------|
+| `/cc-course:setup` | — | Install the required MCP server. Run once after plugin installation. |
+| `/cc-course:start` | `N` (1-5) | Begin a specific module. Example: `/cc-course:start 1` |
+| `/cc-course:continue` | — | Signal you've completed the current step and are ready for the next one. |
+| `/cc-course:status` | — | Display your progress dashboard across all 5 modules. |
+| `/cc-course:validate` | — | Run automated checks to verify your current module is complete. |
+| `/cc-course:hint` | — | Get contextual help for the task you're currently working on. |
+| `/cc-course:submit` | `[module-number]` | Package completed module work into a zip archive for instructor review. |
+| `/cc-course:review` | `<path>` | **(Instructor)** Review student submissions with AI-powered scoring and PDF reports. |
+
+## Detailed Usage
+
+### `/cc-course:setup`
+
+One-time setup command that downloads and installs the `cclogviewer-mcp` binary. This MCP server is used throughout the course for session tracking and progress analysis.
+
+```
+/cc-course:setup
+```
+
+The setup command will:
+1. Detect your platform (macOS, Linux, Windows) and architecture
+2. Download the appropriate pre-built binary
+3. Install it to your PATH
+4. Register it as a Claude Code MCP server
+
+### `/cc-course:start N`
+
+Begin a specific module. Modules are numbered 1 through 5:
+
+```
+/cc-course:start 1    # Foundations & Commands (120 min)
+/cc-course:start 2    # Skills (90 min)
+/cc-course:start 3    # Extensions (120 min)
+/cc-course:start 4    # Agents (120 min)
+/cc-course:start 5    # Workflows (120 min)
+```
+
+<Aside type="tip">
+Modules build on each other sequentially. If you skip ahead, the course will warn you about missing prerequisites and suggest completing earlier modules first.
+</Aside>
+
+When you start a module, Claude will:
+- Check your progress file for any prior completion
+- Resume where you left off if you've already started the module
+- Present the first chapter if starting fresh
+- Detect your role (Frontend, Backend, QA, etc.) and adapt examples accordingly
+
+### `/cc-course:continue`
+
+Signals that you've completed the current step and are ready to proceed. This is the primary way to advance through the course.
+
+```
+/cc-course:continue
+```
+
+The course follows a structured flow: **PRESENT** (concept) → **CHECKPOINT** (understanding check) → **ACTION** (hands-on task) → **VERIFY** (automated validation). Use `/cc-course:continue` after completing each action step.
+
+### `/cc-course:status`
+
+Displays a progress dashboard showing:
+- Your current module and chapter
+- Completion percentage for each module
+- Which tasks have been verified
+- Overall course progress
+
+```
+/cc-course:status
+```
+
+### `/cc-course:validate`
+
+Runs the automated validation checks for your current module. Each module has specific criteria that must be met:
+
+```
+/cc-course:validate
+```
+
+Examples of what validation checks:
+- **Module 1**: Does `CLAUDE.md` exist? Does it contain required sections? Is a custom command present in `.claude/commands/`?
+- **Module 2**: Are skills created in `.claude/skills/`? Do they have correct frontmatter?
+- **Module 3**: Are hooks configured in `.claude/settings.json`? Is `.mcp.json` present?
+- **Module 4**: Are multi-agent patterns documented in `CLAUDE.md`?
+- **Module 5**: Do GitHub Actions workflows exist? Are automation scripts present?
+
+### `/cc-course:hint`
+
+Provides contextual help based on what you're currently working on. The hint system is aware of your current module, chapter, and task.
+
+```
+/cc-course:hint
+```
+
+Hints are progressive — asking multiple times gives increasingly specific guidance without giving away the answer outright.
+
+### `/cc-course:submit`
+
+Packages your completed module work into a zip archive for instructor review. The archive includes all student work artifacts, progress data, and session logs.
+
+```
+/cc-course:submit        # Submit current/most recent module
+/cc-course:submit 3      # Submit Module 3 specifically
+```
+
+**What gets packaged:**
+
+| Artifact | Source | Purpose |
+|----------|--------|---------|
+| Student work files | `CLAUDE.md`, `.claude/commands/`, `.claude/skills/`, etc. | The actual configurations you built |
+| Progress snapshot | `.claude/claude-course/progress.json` | Task completion status |
+| Session logs | cclogviewer MCP | Full session history for review |
+| Manifest | Auto-generated | Submission metadata and inventory |
+
+**Output:** A zip file like `seminar1-jane-doe-2026-03-18.zip` saved to `.claude/claude-course/submissions/`. Share this file with your instructor.
+
+<Aside type="note">
+The submit command is optional and intended for instructor-led cohorts. Self-paced learners can use `/cc-course:validate` to confirm their work instead.
+</Aside>
+
+### `/cc-course:review` (Instructor Command)
+
+AI-powered review of student submissions. Produces detailed scoring across 5 dimensions with separate reports for instructors and students.
+
+```
+/cc-course:review submission.zip                    # Review single submission
+/cc-course:review ./submissions/                    # Batch review entire class
+/cc-course:review                                   # Auto-discover submissions in cwd
+```
+
+**What it produces:**
+
+| Report | Format | Audience | Contains |
+|--------|--------|----------|----------|
+| Instructor report | PDF + Markdown | Instructor | Full analysis, scoring breakdown, session log review, red flags |
+| Student feedback | PDF + Markdown | Student | Actionable feedback, strengths, areas to improve |
+
+**Scoring dimensions:**
+
+1. **Completeness** — Were all required artifacts created?
+2. **Quality** — Are configurations well-structured and meaningful?
+3. **Understanding** — Does session history show genuine learning?
+4. **Originality** — Are solutions tailored to the student's project?
+5. **Best Practices** — Are Claude Code conventions followed?
+
+The review is executed by a dedicated reviewer agent that analyzes the submission zip, reads session logs via the cclogviewer MCP, and writes reports directly to a `reviews/` directory.
+
+<Aside type="caution">
+This command is designed for instructors, not students. It requires the submission zip file produced by `/cc-course:submit`.
+</Aside>
+
+## Learning Flow
+
+The typical workflow during a module looks like this:
+
+```
+/cc-course:start 1          # Begin Module 1
+  ... Claude teaches ...
+  ... You implement ...
+/cc-course:continue          # Ready for next step
+  ... Claude teaches more ...
+  ... You implement more ...
+/cc-course:hint              # Stuck? Get help
+  ... Apply the hint ...
+/cc-course:continue          # Move on
+  ... Repeat ...
+/cc-course:validate          # Verify module completion
+/cc-course:status            # Check overall progress
+/cc-course:start 2           # Begin next module
+```

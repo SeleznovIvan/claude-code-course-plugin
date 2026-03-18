@@ -1,0 +1,95 @@
+---
+title: "Module 2: Skills"
+description: "Create reusable Skills (SKILL.md) for your team's patterns. Install skill-creator, master the codify workflow."
+---
+
+import { Steps, Aside, Card, CardGrid } from '@astrojs/starlight/components';
+
+## Overview
+
+| | |
+|---|---|
+| **Duration** | 110 minutes (80 min guided + 30 min implementation) |
+| **Prerequisites** | Module 1 completed — CLAUDE.md exists, custom command created |
+| **Difficulty** | Intermediate |
+
+Skills are reusable instruction files that teach Claude how your team does things. Unlike CLAUDE.md (which is always loaded), skills are loaded on-demand when Claude detects they are relevant or when you invoke them explicitly.
+
+## Learning Objectives
+
+By the end of this module, you will:
+
+- Understand what Skills are and how they differ from CLAUDE.md and Commands
+- Know the complete SKILL.md frontmatter specification (all 10 fields)
+- Install and use Anthropic's official skill-creator via the `/plugins` Discover tab
+- Master the "do by hand first, then codify" workflow for creating high-quality skills
+- Create reference skills (coding standards, conventions)
+- Create action skills (step-by-step procedures)
+- Test, iterate, and maintain skills effectively
+
+## Chapters
+
+<Steps>
+1. **What Are Skills?**
+   Learn the three-way distinction between CLAUDE.md, Skills, and Commands. Understand the mental model: skills are runbooks/playbooks for Claude. Explore the two content types — reference skills (standards and conventions) and action skills (step-by-step procedures).
+
+2. **Skill File Structure**
+   Dive into the SKILL.md file format with its 10 frontmatter fields: `name`, `description`, `glob`, `user-invocable`, `disable-model-invocation`, `$ARGUMENTS`, and more. Understand how skill loading priority works across enterprise, personal, project, and plugin scopes.
+
+3. **Install skill-creator & The Codify Workflow**
+   Install Anthropic's official `skill-creator` plugin from the Discover tab. Learn the "do by hand first, then codify" workflow — the key to creating skills that actually work well.
+
+4. **Creating a Reference Skill**
+   Build your first reference skill that captures your project's coding standards or conventions. Reference skills are loaded as context when Claude detects they are relevant (e.g., a naming convention skill activates when Claude creates new files).
+
+5. **Creating an Action Skill**
+   Build an action skill that defines a step-by-step procedure for a common task in your project (e.g., "create a new component," "add an API endpoint," "set up a test suite"). Action skills use `$ARGUMENTS` for parameterization.
+
+6. **Testing & Iterating**
+   Test your skills by giving Claude tasks that should trigger them. Learn to iterate on skill content based on Claude's actual behavior. Understand common pitfalls and debugging techniques.
+
+7. **Advanced Patterns & Maintenance**
+   Explore advanced skill patterns: conditional logic, multi-file skills, skill composition. Learn maintenance strategies for keeping skills up to date as your project evolves.
+
+8. **Commit Your Skills**
+   Commit all skills created during this module to your repository.
+</Steps>
+
+## What You'll Build
+
+By the end of this module, your repository will contain:
+
+```
+your-repo/
+└── .claude/
+    └── skills/
+        ├── reference-skill.md         # Coding standards / conventions
+        └── action-skill.md            # Step-by-step procedure
+```
+
+## Key Concepts
+
+<CardGrid>
+  <Card title="Reference Skills" icon="information">
+    Provide context and standards — coding conventions, architecture docs, API specifications. Often auto-detected by Claude based on the task.
+  </Card>
+  <Card title="Action Skills" icon="rocket">
+    Define step-by-step procedures — "how to create a component," "how to add an endpoint." Invoked explicitly by the user or triggered by task context.
+  </Card>
+  <Card title="The Codify Workflow" icon="pencil">
+    Do the task by hand first, observe what works, then capture it as a skill. This produces much better skills than writing them from scratch.
+  </Card>
+  <Card title="skill-creator Plugin" icon="puzzle">
+    Anthropic's official plugin that helps you create well-structured skills from observed patterns. Install it from the Discover tab.
+  </Card>
+</CardGrid>
+
+## Start This Module
+
+```
+/cc-course:start 2
+```
+
+<Aside type="caution">
+Make sure you have completed Module 1 first. This module assumes you have a working CLAUDE.md and understand slash commands and plan mode.
+</Aside>

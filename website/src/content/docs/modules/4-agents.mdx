@@ -1,0 +1,97 @@
+---
+title: "Module 4: Agents"
+description: "Launch subagents for parallel work, use git worktrees, run multiple Claude instances, and merge parallel results."
+---
+
+import { Steps, Aside, Card, CardGrid } from '@astrojs/starlight/components';
+
+## Overview
+
+| | |
+|---|---|
+| **Duration** | 120 minutes (80 min guided + 40 min implementation) |
+| **Prerequisites** | Modules 1-3 completed — CLAUDE.md, skills, hooks, and MCP configured |
+| **Difficulty** | Advanced |
+
+This module teaches you to scale Claude Code beyond a single session. You will learn to delegate work to subagents, run multiple Claude instances in parallel using git worktrees, and merge the results back together.
+
+## Learning Objectives
+
+By the end of this module, you will:
+
+- Understand subagent architecture: types, context isolation, and when to delegate
+- Use explicit delegation prompts to launch subagents for focused tasks
+- Recognize and apply parallel execution patterns (Divide & Conquer, Specialist, Writer + Reviewer, Fan-out, Pipeline)
+- Set up git worktrees for conflict-free parallel agent work
+- Run multiple Claude instances simultaneously in separate worktrees
+- Merge parallel work, resolve conflicts, and clean up worktrees
+- Document multi-agent patterns in CLAUDE.md for team reuse
+
+## Chapters
+
+<Steps>
+1. **Understanding Agents & Subagents**
+   Learn what subagents are — isolated Claude instances launched to handle specific subtasks. Understand the subagent types (`general-purpose`, `Explore`, `Plan`), context isolation (what inherits and what does not), foreground vs background execution, and when to use subagents vs a single session.
+
+2. **Using Subagents**
+   Practice launching subagents with explicit delegation prompts. Learn how to write effective task descriptions that give subagents enough context to work independently. Experiment with foreground and background execution modes.
+
+3. **Parallel Execution Patterns**
+   Study five patterns for parallelizing work: **Divide & Conquer** (split a large task), **Specialist** (different expertise per agent), **Writer + Reviewer** (implementation + fresh-eyes review), **Fan-out** (same task across multiple targets), and **Pipeline** (sequential stages with handoff).
+
+4. **Git Worktrees**
+   Set up git worktrees so multiple Claude instances can work on the same repository without file conflicts. Learn `git worktree add`, `git worktree list`, and `git worktree remove`. Understand the branch-per-worktree model.
+
+5. **Running Parallel Agents**
+   Launch multiple Claude instances in separate worktrees simultaneously. Practice the full workflow: create worktrees, start agents in each, monitor progress, and collect results.
+
+6. **Merging Parallel Work**
+   Merge branches from parallel worktrees back into your main branch. Learn conflict resolution strategies, review techniques, and cleanup procedures for worktrees and temporary branches.
+
+7. **Documenting Patterns**
+   Add a "Multi-Agent Patterns" section to your CLAUDE.md that documents which patterns you found most useful, when to use them, and any project-specific delegation strategies.
+
+8. **Commit Your Work**
+   Commit the updated CLAUDE.md with multi-agent patterns and any other artifacts from this module.
+</Steps>
+
+## What You'll Build
+
+By the end of this module, your repository will contain:
+
+```
+your-repo/
+├── CLAUDE.md                          # Updated with multi-agent patterns section
+└── .claude/
+    └── commands/
+        └── (optional worktree commands)
+```
+
+You will also gain hands-on experience with git worktrees and parallel agent execution that you can apply immediately to real tasks.
+
+## Key Concepts
+
+<CardGrid>
+  <Card title="Subagents" icon="rocket">
+    Isolated Claude instances launched via the Agent tool. Each gets fresh context but inherits CLAUDE.md, skills, and MCP config.
+  </Card>
+  <Card title="Context Isolation" icon="document">
+    Subagents do not see the parent's conversation history. This is a feature — focused context prevents the "growing context" problem.
+  </Card>
+  <Card title="Git Worktrees" icon="github">
+    Multiple working directories sharing the same git repository. Each worktree has its own branch, enabling conflict-free parallel work.
+  </Card>
+  <Card title="Parallel Patterns" icon="list-format">
+    Five reusable patterns for multi-agent work: Divide & Conquer, Specialist, Writer + Reviewer, Fan-out, and Pipeline.
+  </Card>
+</CardGrid>
+
+## Start This Module
+
+```
+/cc-course:start 4
+```
+
+<Aside type="caution">
+This module requires all previous modules. You need working hooks, MCP configuration, and skills before tackling multi-agent patterns.
+</Aside>

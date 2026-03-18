@@ -1,0 +1,199 @@
+---
+title: Getting Started
+description: Install and start the Claude Code Developer Course in under 5 minutes.
+---
+
+import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+## Prerequisites
+
+Before starting the course, make sure you have:
+
+- **Claude Code** installed on your machine (`npm install -g @anthropic-ai/claude-code`)
+- **A GitHub repository** you can work on (a real project is preferred over a toy repo)
+- **Claude Pro or Max subscription** ($20/month — required for API access)
+- **Node.js 18+** (needed to run Claude Code)
+- **~10 hours** over 1-4 weeks (self-paced)
+
+No prior Claude Code experience is required. Basic familiarity with AI chat tools (ChatGPT, Claude.ai, etc.) is helpful.
+
+## Installation
+
+Choose the installation method that works best for you:
+
+<Tabs>
+  <TabItem label="Plugin Marketplace (Recommended)">
+    ```bash
+    claude plugin marketplace add https://github.com/SeleznovIvan/claude-code-education
+    claude plugin install cc-course@claude-code-education
+    ```
+    This downloads the latest version from the official marketplace.
+  </TabItem>
+  <TabItem label="Manual Installation">
+    ```bash
+    git clone https://github.com/SeleznovIvan/claude-code-course-plugin.git ~/.claude/plugins/cc-course
+    ```
+    Clone the repository directly into your Claude Code plugins directory.
+  </TabItem>
+  <TabItem label="Development Mode">
+    ```bash
+    git clone https://github.com/SeleznovIvan/claude-code-course-plugin.git
+    claude --plugin-dir ./claude-code-course-plugin
+    ```
+    Use this if you want to explore or modify the course source code.
+  </TabItem>
+</Tabs>
+
+## Post-Installation Setup
+
+After installing the plugin, you need to set up the bundled MCP server (one-time step):
+
+<Steps>
+1. **Start Claude Code** in your project directory:
+   ```bash
+   cd /path/to/your/repo
+   claude
+   ```
+
+2. **Run the setup command** inside Claude Code:
+   ```
+   /cc-course:setup
+   ```
+   This downloads and installs the `cclogviewer-mcp` binary used for session tracking throughout the course.
+</Steps>
+
+### Manual MCP Installation
+
+If the automatic setup fails, you can install the MCP server manually:
+
+<Tabs>
+  <TabItem label="Pre-built Binary (No Go Required)">
+    ```bash
+    # Download for your platform
+    curl -L https://github.com/SeleznovIvan/cclogviewer/releases/latest/download/cclogviewer-mcp-darwin-arm64 -o ~/.local/bin/cclogviewer-mcp
+    chmod +x ~/.local/bin/cclogviewer-mcp
+
+    # Add to Claude Code
+    claude mcp add cclogviewer cclogviewer-mcp
+    ```
+
+    Available binaries:
+    - `cclogviewer-mcp-darwin-arm64` (Mac Apple Silicon)
+    - `cclogviewer-mcp-darwin-amd64` (Mac Intel)
+    - `cclogviewer-mcp-linux-amd64` (Linux x64)
+    - `cclogviewer-mcp-linux-arm64` (Linux ARM)
+    - `cclogviewer-mcp-windows-amd64.exe` (Windows)
+
+    See all releases: [github.com/SeleznovIvan/cclogviewer/releases](https://github.com/SeleznovIvan/cclogviewer/releases)
+  </TabItem>
+  <TabItem label="Go Install (Requires Go 1.21+)">
+    ```bash
+    go install github.com/SeleznovIvan/cclogviewer/cmd/cclogviewer-mcp@latest
+    claude mcp add cclogviewer cclogviewer-mcp
+    ```
+  </TabItem>
+</Tabs>
+
+## Quick Start
+
+<Steps>
+1. **Start Claude Code in your project**
+   ```bash
+   cd /path/to/your/repo
+   claude
+   ```
+
+2. **Begin Module 1**
+   ```
+   /cc-course:start 1
+   ```
+
+3. **Follow Claude's guidance** — Claude will present concepts, check your understanding, give you hands-on tasks, and verify your work.
+
+4. **Use `/cc-course:continue`** to signal you've completed the current step and are ready to move on.
+
+5. **Check your progress** anytime with:
+   ```
+   /cc-course:status
+   ```
+</Steps>
+
+<Aside type="tip">
+You can start any module directly with `/cc-course:start N` (where N is 1-5), but modules build on each other. Starting with Module 1 is strongly recommended.
+</Aside>
+
+## How the Course Works
+
+The course runs entirely inside Claude Code. There are no videos, slides, or external materials to read. Here is the learning flow:
+
+1. **Claude presents a concept** — explains a feature with examples relevant to your tech stack
+2. **Checkpoint** — Claude checks your understanding before moving on
+3. **Hands-on task** — you implement something in your own repository
+4. **Verification** — automated validators confirm your work is correct
+5. **Repeat** — move to the next chapter
+
+Your progress is tracked in a `progress.json` file inside your repository, so you can pick up where you left off across sessions.
+
+## Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `/cc-course:setup` | Install the required MCP server (one-time) |
+| `/cc-course:start N` | Begin a specific module (1-5) |
+| `/cc-course:continue` | Signal you're done with the current step |
+| `/cc-course:status` | See your progress across all modules |
+| `/cc-course:validate` | Check if current module is complete |
+| `/cc-course:hint` | Get help with current task |
+| `/cc-course:submit` | Package completed work for instructor review |
+
+See the full [Commands Reference](/claude-code-course/commands/) for details.
+
+## Troubleshooting
+
+### Plugin not loading
+
+1. Verify the plugin is installed:
+   ```bash
+   ls ~/.claude/plugins/cc-course
+   ```
+
+2. Check Claude Code recognizes it:
+   ```bash
+   claude --debug
+   ```
+   Look for plugin loading messages in the output.
+
+3. Restart Claude Code and try again.
+
+### MCP server not starting
+
+1. Run the setup command again:
+   ```
+   /cc-course:setup
+   ```
+
+2. Verify the binary works:
+   ```bash
+   which cclogviewer-mcp
+   echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | cclogviewer-mcp
+   ```
+
+3. Check MCP is configured:
+   ```bash
+   claude mcp list
+   ```
+
+### Commands not found
+
+If `/cc-course:*` commands don't appear:
+
+1. Restart Claude Code
+2. Verify the skills directory exists:
+   ```bash
+   ls ~/.claude/plugins/cc-course/skills/
+   ```
+3. Re-install the plugin if needed
+
+## Next Steps
+
+Ready to begin? Start with [Module 1: Foundations & Commands](/claude-code-course/modules/1-foundations/) to set up your CLAUDE.md, learn essential commands, and create your first custom slash command.

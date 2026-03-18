@@ -1,0 +1,96 @@
+---
+title: "Module 5: Workflows"
+description: "Create GitHub Actions with Claude, build automation scripts, set up CI/CD pipelines, and graduate from the course."
+---
+
+import { Steps, Aside, Card, CardGrid } from '@astrojs/starlight/components';
+
+## Overview
+
+| | |
+|---|---|
+| **Duration** | 120 minutes (80 min guided + 40 min implementation) |
+| **Prerequisites** | Modules 1-4 completed — full Claude Code configuration in place |
+| **Difficulty** | Advanced |
+
+The final module brings everything together. You will integrate Claude Code into your development pipeline — automating PR reviews, building reusable scripts, and creating CI/CD workflows that run Claude non-interactively.
+
+## Learning Objectives
+
+By the end of this module, you will:
+
+- Understand the three methods for integrating Claude Code with CI/CD: headless CLI, GitHub Actions, and GitHub MCP
+- Use headless mode (`claude -p "prompt"`) for automated, non-interactive tasks
+- Create GitHub Actions workflows that leverage Claude for PR review and code quality
+- Build reusable automation scripts with proper error handling and bounded execution
+- Test and productionize Claude-powered workflows with cost management and safety patterns
+- Document all automated workflows in CLAUDE.md for team reuse
+
+## Chapters
+
+<Steps>
+1. **CI/CD with Claude Overview**
+   Understand what automated Claude integration enables: PR reviews, issue triage, code fixes, documentation generation, test creation, and release notes. Learn the three integration methods — headless CLI (`claude -p`), GitHub Actions, and GitHub MCP — and how they work together.
+
+2. **GitHub Integration**
+   Verify or set up GitHub MCP for PR and issue access within Claude Code sessions. Learn how to use GitHub's API through Claude for interactive repository management.
+
+3. **Headless Mode**
+   Master `claude -p "prompt"` for running Claude non-interactively. Learn output formats (`--output-format json`), session management, and how headless mode serves as the foundation for all automated workflows.
+
+4. **GitHub Actions**
+   Create a GitHub Actions workflow (`.github/workflows/claude-*.yml`) that triggers Claude on pull request events. Build an automated PR reviewer that checks code quality, identifies bugs, and posts review comments.
+
+5. **Automation Scripts**
+   Build reusable shell scripts (`scripts/claude-*.sh`) that wrap headless Claude with proper error handling, timeout management, and bounded execution. Create scripts for common tasks in your project.
+
+6. **Testing & Production**
+   Test your automated workflows end-to-end. Learn cost management strategies (token limits, model selection), safety patterns (dry-run modes, approval gates), and monitoring approaches for production Claude workflows.
+
+7. **Documenting Workflows**
+   Add an "Automated Workflows" section to your CLAUDE.md that documents all scripts, GitHub Actions, and integration patterns. Ensure your team can discover, use, and maintain these workflows.
+
+8. **Final Commit & Graduation**
+   Commit all workflow artifacts and complete the course. Review everything you have built across all 5 modules and receive your graduation status.
+</Steps>
+
+## What You'll Build
+
+By the end of this module, your repository will contain:
+
+```
+your-repo/
+├── CLAUDE.md                          # Updated with automated workflows section
+├── .github/
+│   └── workflows/
+│       └── claude-review.yml          # Automated PR review workflow
+└── scripts/
+    └── claude-review.sh               # Reusable automation script
+```
+
+## Key Concepts
+
+<CardGrid>
+  <Card title="Headless Mode" icon="laptop">
+    Run Claude non-interactively with `claude -p "prompt"`. The foundation for all automated Claude workflows — both scripts and GitHub Actions use it.
+  </Card>
+  <Card title="GitHub Actions" icon="github">
+    CI/CD workflows triggered by repository events (PR opened, push, issue created). Your Actions invoke Claude headlessly to review, analyze, or generate code.
+  </Card>
+  <Card title="Automation Scripts" icon="setting">
+    Shell scripts wrapping `claude -p` with error handling, timeouts, and bounded execution. Reusable building blocks for team automation.
+  </Card>
+  <Card title="Cost & Safety" icon="warning">
+    Production patterns: token limits, model selection, dry-run modes, approval gates, and monitoring. Essential for running Claude at scale.
+  </Card>
+</CardGrid>
+
+## Start This Module
+
+```
+/cc-course:start 5
+```
+
+<Aside type="note">
+This is the final module. Upon completion, you will have a fully configured Claude Code setup with CLAUDE.md, skills, commands, hooks, MCP servers, multi-agent patterns, GitHub Actions, and automation scripts — all built for your actual repository.
+</Aside>

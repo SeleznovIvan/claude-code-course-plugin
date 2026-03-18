@@ -1,0 +1,95 @@
+---
+title: "Module 3: Extensions"
+description: "Build hooks for event-driven automation, configure MCP servers, and create advanced multi-step commands."
+---
+
+import { Steps, Aside, Card, CardGrid } from '@astrojs/starlight/components';
+
+## Overview
+
+| | |
+|---|---|
+| **Duration** | 120 minutes (80 min guided + 40 min implementation) |
+| **Prerequisites** | Modules 1-2 completed — CLAUDE.md, commands, and skills in place |
+| **Difficulty** | Intermediate-Advanced |
+
+Extensions expand what Claude Code can do beyond its defaults. This module covers three extension types: hooks (event-driven automation), MCP servers (external tool integration), and advanced commands (multi-step parameterized workflows).
+
+## Learning Objectives
+
+By the end of this module, you will:
+
+- Understand the 4 hook events and 4 handler types for event-driven automation
+- Create hooks with the correct 3-level configuration structure (event, matcher group, handler array)
+- Configure MCP servers in `.mcp.json` with proper transport types
+- Use MCP tools naturally in Claude Code sessions
+- Build advanced custom commands with `$ARGUMENTS` and multi-step workflows
+- Understand the extension ecosystem and how hooks, MCP, and commands work together
+
+## Chapters
+
+<Steps>
+1. **Understanding Hooks**
+   Learn the four hook events (`PreToolUse`, `PostToolUse`, `Notification`, `Stop`) and four handler types (`command`, `http`, `prompt`, `agent`). Understand that `PreToolUse` is the only event that can block actions (exit code 2). Study the use case matrix to know which event + handler type fits common scenarios.
+
+2. **Creating Hooks**
+   Build your first hook in `.claude/settings.json`. Learn the 3-level configuration structure: event level, matcher group level, and handler array level. Create a practical hook — for example, auto-formatting code after writes or blocking writes to protected directories.
+
+3. **Testing Hooks**
+   Verify your hooks work correctly by triggering the events they listen to. Learn debugging techniques for hooks that don't fire or produce unexpected results.
+
+4. **MCP Overview**
+   Understand what MCP (Model Context Protocol) servers are and how they extend Claude's capabilities with external tools. Learn the difference between `stdio` and `sse` transport types.
+
+5. **Configuring MCP**
+   Set up an MCP server in your `.mcp.json` file. Configure transport, authentication, and environment variables. Learn how to use `claude mcp add` for quick setup.
+
+6. **Using MCP**
+   Practice using MCP tools within Claude Code sessions. Learn how Claude discovers and invokes MCP tools, and how to verify MCP servers are running correctly.
+
+7. **Advanced Commands**
+   Create advanced custom commands that combine multiple steps, use `$ARGUMENTS` for parameterization, and orchestrate hooks and MCP tools together. Build a command that automates a multi-step workflow in your project.
+
+8. **Commit Extensions**
+   Commit all extension configurations — hooks, MCP config, and advanced commands — to your repository.
+</Steps>
+
+## What You'll Build
+
+By the end of this module, your repository will contain:
+
+```
+your-repo/
+├── .mcp.json                          # MCP server configurations
+└── .claude/
+    ├── settings.json                  # Hooks configuration added
+    └── commands/
+        └── advanced-command.md        # Multi-step parameterized command
+```
+
+## Key Concepts
+
+<CardGrid>
+  <Card title="Hooks" icon="setting">
+    Event-driven automation triggers that run shell commands when Claude performs certain actions. Four events: PreToolUse, PostToolUse, Notification, Stop.
+  </Card>
+  <Card title="MCP Servers" icon="external">
+    External tool servers that give Claude access to APIs, databases, and services via the Model Context Protocol. Configured in `.mcp.json`.
+  </Card>
+  <Card title="PreToolUse Blocking" icon="warning">
+    The only hook event that can prevent Claude from executing an action. Exit code 2 blocks the tool call and sends stderr as feedback.
+  </Card>
+  <Card title="Advanced Commands" icon="forward-slash">
+    Multi-step commands that combine `$ARGUMENTS`, conditional logic, and orchestration of hooks and MCP tools for complex workflows.
+  </Card>
+</CardGrid>
+
+## Start This Module
+
+```
+/cc-course:start 3
+```
+
+<Aside type="caution">
+Make sure you have completed Modules 1 and 2 first. This module builds on your CLAUDE.md, custom commands, and skills from earlier modules.
+</Aside>

@@ -1,0 +1,99 @@
+---
+title: "Module 1: Foundations & Commands"
+description: "Set up CLAUDE.md, learn essential CLI interactions, master slash commands, and create your first custom command."
+---
+
+import { Steps, Aside, Card, CardGrid } from '@astrojs/starlight/components';
+
+## Overview
+
+| | |
+|---|---|
+| **Duration** | 120 minutes (90 min guided + 30 min hands-on) |
+| **Prerequisites** | Claude Code installed, a GitHub repository to work on |
+| **Difficulty** | Beginner — no prior Claude Code experience needed |
+
+This is the starting module. You will go from zero Claude Code experience to having a fully configured project with CLAUDE.md, security settings, and a custom slash command.
+
+## Learning Objectives
+
+By the end of this module, you will:
+
+- Navigate basic CLI interactions confidently
+- Create a CLAUDE.md file that captures your project's context
+- Use slash commands fluently for common operations
+- Create a custom slash command for your workflow
+
+## Chapters
+
+<Steps>
+1. **What is Claude Code?**
+   Understand the key differences between Claude Code and other AI coding tools (Copilot, Cursor). Learn the "pair programmer in your terminal" mental model — terminal-native, full codebase awareness, agentic execution, and memory persistence.
+
+2. **Installation & Authentication**
+   Verify your Claude Code installation is working correctly. Confirm CLI version, authentication status, and basic functionality.
+
+3. **CLI Basics**
+   Learn the core interaction patterns: asking questions, generating code, running commands. Practice multi-turn conversations and understand how Claude maintains context within a session.
+
+4. **CLAUDE.md**
+   Create the most important file in your Claude Code setup. CLAUDE.md serves as persistent memory across sessions — it tells Claude about your project's structure, conventions, tech stack, and preferences. You will write one tailored to your actual repository.
+
+5. **Testing Your Setup**
+   Configure `permissions.deny` in `.claude/settings.json` to establish security boundaries. Test that CLAUDE.md is being loaded and applied correctly by giving Claude tasks that require project-specific knowledge.
+
+6. **Slash Commands** (4 parts)
+   - **6a — Discovery Commands**: Learn `/init`, `/doctor`, `/config`, and other built-in commands for exploring and configuring Claude Code.
+   - **6b — Understanding Context**: Explore how Claude's context window works and what information is loaded into each session.
+   - **6c — Context Management**: Master `/compact`, `/clear`, and other commands for managing context effectively during long sessions.
+   - **6d — Status Line**: Read and interpret the Claude Code status line to understand token usage, model info, and session state.
+
+7. **Plan Mode**
+   Use plan mode (`shift+tab` or `/plan`) for complex tasks. Learn when to plan before executing and how to review Claude's proposed approach before it writes any code.
+
+8. **Custom Commands**
+   Create a custom slash command in `.claude/commands/` that automates a task specific to your workflow. Learn the command file format and how to use `$ARGUMENTS` for parameterized commands.
+
+9. **Commit Your Work**
+   Commit all artifacts created during this module — CLAUDE.md, settings.json, and your custom command — to your repository.
+</Steps>
+
+## What You'll Build
+
+By the end of this module, your repository will contain:
+
+```
+your-repo/
+├── CLAUDE.md                          # Project context and memory
+└── .claude/
+    ├── settings.json                  # Security config with permissions.deny
+    └── commands/
+        └── your-command.md            # Custom slash command
+```
+
+## Key Concepts
+
+<CardGrid>
+  <Card title="CLAUDE.md" icon="document">
+    Persistent memory file loaded every session. Contains project structure, conventions, tech stack, and preferences.
+  </Card>
+  <Card title="permissions.deny" icon="warning">
+    Security configuration that prevents Claude from executing dangerous commands or writing to sensitive paths.
+  </Card>
+  <Card title="Slash Commands" icon="forward-slash">
+    Built-in and custom commands triggered with `/`. Custom commands live in `.claude/commands/` as markdown files.
+  </Card>
+  <Card title="Plan Mode" icon="list-format">
+    Think-before-acting mode where Claude proposes an approach and waits for approval before making changes.
+  </Card>
+</CardGrid>
+
+## Start This Module
+
+```
+/cc-course:start 1
+```
+
+<Aside type="tip">
+This module covers a lot of ground in 12 chapters. Take breaks between sections — your progress is saved automatically and you can resume anytime with `/cc-course:start 1`.
+</Aside>

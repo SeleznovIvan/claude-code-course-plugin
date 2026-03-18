@@ -1,0 +1,293 @@
+/* ═══════════════════════════════════════════════
+   Claude Code Course — CLI Terminal Theme
+   ═══════════════════════════════════════════════ */
+
+/* --- Fonts: monospace everywhere --- */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+:root {
+	/* Dark terminal palette */
+	--sl-font: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', monospace;
+	--sl-font-system-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+	/* Claude Code colors — warm amber on dark */
+	--sl-color-accent-low: #1a1510;
+	--sl-color-accent: #d4a574;
+	--sl-color-accent-high: #f5e6d3;
+	--sl-color-white: #e0d8cc;
+	--sl-color-gray-1: #c4b8a8;
+	--sl-color-gray-2: #998b78;
+	--sl-color-gray-3: #6e6356;
+	--sl-color-gray-4: #3d3630;
+	--sl-color-gray-5: #252019;
+	--sl-color-gray-6: #1a1510;
+	--sl-color-black: #0d0b08;
+
+	/* Terminal green for accents */
+	--cli-green: #4ec26a;
+	--cli-amber: #d4a574;
+	--cli-blue: #7eb8da;
+	--cli-red: #e06c60;
+	--cli-dim: #6e6356;
+	--cli-prompt: #d4a574;
+	--cli-cursor: #d4a574;
+
+	/* Glow effect for terminal feel */
+	--cli-glow: 0 0 10px rgba(212, 165, 116, 0.15);
+}
+
+:root[data-theme='light'] {
+	--sl-color-accent-low: #f5efe8;
+	--sl-color-accent: #8b6e4e;
+	--sl-color-accent-high: #1a1510;
+	--sl-color-white: #1a1510;
+	--sl-color-gray-1: #2d2820;
+	--sl-color-gray-2: #4a4035;
+	--sl-color-gray-3: #7a6e60;
+	--sl-color-gray-4: #b0a494;
+	--sl-color-gray-5: #e8e0d4;
+	--sl-color-gray-6: #f5efe8;
+	--sl-color-black: #faf8f5;
+	--cli-green: #2a7a3e;
+	--cli-amber: #8b6e4e;
+	--cli-blue: #3a7a9e;
+	--cli-dim: #7a6e60;
+	--cli-prompt: #8b6e4e;
+}
+
+/* --- Global terminal feel --- */
+body {
+	letter-spacing: 0.01em;
+}
+
+/* --- Top Header / Navbar --- */
+header.header {
+	border-bottom: 1px solid var(--sl-color-gray-5);
+	box-shadow: var(--cli-glow);
+}
+
+/* Make site title look like a prompt */
+.site-title span {
+	font-weight: 600;
+}
+
+/* --- Sidebar terminal style --- */
+nav.sidebar {
+	border-right: 1px solid var(--sl-color-gray-5);
+}
+
+nav.sidebar a {
+	font-size: 0.85rem;
+	letter-spacing: 0.02em;
+}
+
+nav.sidebar a[aria-current="page"],
+sidebar a[aria-current="page"],
+[aria-current="page"] {
+	border-left: 3px solid var(--cli-green) !important;
+	background: rgba(78, 194, 106, 0.12) !important;
+	color: var(--cli-green) !important;
+	font-weight: 600 !important;
+}
+
+/* Ensure selected text is visible in both themes */
+starlight-menu-button + nav a[aria-current="page"],
+.sidebar-content a[aria-current="page"],
+nav a[aria-current="page"] {
+	color: var(--cli-green) !important;
+}
+
+/* Prefix sidebar links with terminal markers */
+nav.sidebar .top-level > li > details > summary::before,
+nav.sidebar .top-level > li > a::before {
+	content: '>';
+	color: var(--cli-dim);
+	margin-right: 0.5em;
+	font-weight: 300;
+}
+
+nav.sidebar .top-level > li > a[aria-current="page"]::before {
+	content: '>';
+	color: var(--cli-green);
+}
+
+/* --- Content area --- */
+.content-panel {
+	font-size: 0.92rem;
+	line-height: 1.7;
+}
+
+/* Headings with terminal markers */
+.sl-markdown-content h2 {
+	border-bottom: 1px solid var(--sl-color-gray-5);
+	padding-bottom: 0.5rem;
+	margin-top: 2.5rem;
+}
+
+.sl-markdown-content h2::before {
+	content: '## ';
+	color: var(--cli-dim);
+	font-weight: 300;
+}
+
+.sl-markdown-content h3::before {
+	content: '### ';
+	color: var(--cli-dim);
+	font-weight: 300;
+}
+
+/* Code blocks look like terminal output */
+.sl-markdown-content pre {
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 6px;
+	box-shadow: var(--cli-glow);
+}
+
+.sl-markdown-content code:not(pre code) {
+	background: rgba(212, 165, 116, 0.1);
+	border: 1px solid rgba(212, 165, 116, 0.2);
+	color: var(--cli-amber);
+	border-radius: 3px;
+	padding: 0.1em 0.35em;
+	font-size: 0.88em;
+}
+
+/* --- Hero page (splash) --- */
+.hero {
+	padding: 4rem 1rem;
+}
+
+.hero .hero-title {
+	font-size: 2.2rem;
+	line-height: 1.3;
+}
+
+/* --- Starlight Cards with terminal borders --- */
+.card {
+	border: 1px solid var(--sl-color-gray-5) !important;
+	border-radius: 6px !important;
+	transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+	border-color: var(--cli-amber) !important;
+	box-shadow: var(--cli-glow);
+}
+
+/* Card title icon color */
+.card .card-icon {
+	color: var(--cli-amber);
+}
+
+/* --- Steps with CLI prompt markers --- */
+.sl-steps > li::before {
+	background: var(--cli-amber) !important;
+}
+
+/* --- Tables --- */
+.sl-markdown-content table {
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 6px;
+	overflow: hidden;
+	font-size: 0.88rem;
+}
+
+.sl-markdown-content th {
+	background: rgba(212, 165, 116, 0.08);
+	font-weight: 600;
+	text-transform: uppercase;
+	font-size: 0.78rem;
+	letter-spacing: 0.06em;
+}
+
+.sl-markdown-content td,
+.sl-markdown-content th {
+	border-color: var(--sl-color-gray-5);
+}
+
+/* --- Custom CLI prompt blocks --- */
+.cli-block {
+	background: var(--sl-color-gray-6);
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 6px;
+	padding: 1.5rem;
+	margin: 1.5rem 0;
+	font-family: var(--sl-font-system-mono);
+	font-size: 0.88rem;
+	line-height: 1.8;
+	box-shadow: var(--cli-glow);
+}
+
+.cli-block .prompt {
+	color: var(--cli-amber);
+}
+
+.cli-block .output {
+	color: var(--cli-green);
+}
+
+.cli-block .dim {
+	color: var(--cli-dim);
+}
+
+/* --- File tree styling --- */
+.file-tree {
+	background: var(--sl-color-gray-6);
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 6px;
+	padding: 1.25rem 1.5rem;
+	font-size: 0.85rem;
+	line-height: 1.7;
+	box-shadow: var(--cli-glow);
+}
+
+/* --- Blinking cursor animation --- */
+@keyframes blink {
+	0%, 50% { opacity: 1; }
+	51%, 100% { opacity: 0; }
+}
+
+.cursor {
+	display: inline-block;
+	width: 0.6em;
+	height: 1.1em;
+	background: var(--cli-cursor);
+	animation: blink 1s step-end infinite;
+	vertical-align: text-bottom;
+	margin-left: 2px;
+}
+
+/* --- Status badges --- */
+.status-badge {
+	display: inline-block;
+	padding: 0.15rem 0.6rem;
+	border-radius: 3px;
+	font-size: 0.78rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+}
+
+.status-badge.green {
+	background: rgba(78, 194, 106, 0.15);
+	color: var(--cli-green);
+	border: 1px solid rgba(78, 194, 106, 0.3);
+}
+
+.status-badge.amber {
+	background: rgba(212, 165, 116, 0.15);
+	color: var(--cli-amber);
+	border: 1px solid rgba(212, 165, 116, 0.3);
+}
+
+/* --- Footer --- */
+footer.footer {
+	border-top: 1px solid var(--sl-color-gray-5);
+	font-size: 0.8rem;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+	.hero .hero-title {
+		font-size: 1.6rem;
+	}
+}

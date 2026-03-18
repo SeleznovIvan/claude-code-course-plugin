@@ -1,0 +1,203 @@
+---
+title: Claude Code Developer Course
+description: Learn Claude Code by DOING Claude Code — An interactive 5-module course taught inside Claude Code itself.
+template: splash
+hero:
+  title: |
+    <span style="color: var(--cli-dim);">$</span> learn claude-code <span style="color: var(--cli-green);">--by-doing</span>
+  tagline: |
+    The only course taught INSIDE Claude Code.
+    Work on YOUR repo. Build real configs. Master the tool by using it.
+  actions:
+    - text: '$ /cc-course:start 1'
+      link: /claude-code-course/getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: View Source
+      link: https://github.com/SeleznovIvan/claude-code-course-plugin
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<div class="cli-block">
+<span class="prompt">$</span> claude<br/>
+<span class="output">╭──────────────────────────────────────────────────╮</span><br/>
+<span class="output">│</span> <strong>Claude Code Developer Course</strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="output">│</span><br/>
+<span class="output">│</span> <span class="dim">5 modules · 8 chapters each · ~10 hours</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="output">│</span><br/>
+<span class="output">│</span> <span class="dim">Your repo. Real configs. Validated progress.</span> &nbsp;&nbsp;&nbsp;<span class="output">│</span><br/>
+<span class="output">╰──────────────────────────────────────────────────╯</span><br/>
+<span class="prompt">$</span> /cc-course:start 1<span class="cursor"></span>
+</div>
+
+## How It Works
+
+<CardGrid>
+  <Card title="No videos. No slides." icon="laptop">
+    Claude itself teaches you — step by step, inside a real Claude Code session. Meta-learning at its best.
+  </Card>
+  <Card title="YOUR repository" icon="document">
+    Every task applies to your actual project. No toy examples — you build configs you'll keep and use daily.
+  </Card>
+  <Card title="Personalized to your usage" icon="star">
+    The bundled cclogviewer MCP parses your Claude Code session logs — so Claude analyzes how YOU actually use the tool and tailors advice, suggests what to automate, and picks tasks based on your real workflows.
+  </Card>
+  <Card title="Role-adapted" icon="setting">
+    Guidance adapts to your role — Frontend, Backend, QA, DevOps, Data, or Fullstack.
+  </Card>
+</CardGrid>
+
+## Course Modules
+
+<div class="cli-block">
+<span class="dim">MODULE&nbsp;&nbsp;TOPIC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DURATION&nbsp;&nbsp;STATUS</span><br/>
+<span class="prompt">  1</span>&nbsp;&nbsp;&nbsp;&nbsp;Foundations & Commands&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;120 min&nbsp;&nbsp;&nbsp;<span class="output">READY</span><br/>
+<span class="prompt">  2</span>&nbsp;&nbsp;&nbsp;&nbsp;Skills&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;90 min&nbsp;&nbsp;&nbsp;&nbsp;<span class="output">READY</span><br/>
+<span class="prompt">  3</span>&nbsp;&nbsp;&nbsp;&nbsp;Extensions&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;120 min&nbsp;&nbsp;&nbsp;<span class="output">READY</span><br/>
+<span class="prompt">  4</span>&nbsp;&nbsp;&nbsp;&nbsp;Agents&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;120 min&nbsp;&nbsp;&nbsp;<span class="output">READY</span><br/>
+<span class="prompt">  5</span>&nbsp;&nbsp;&nbsp;&nbsp;Workflows&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;120 min&nbsp;&nbsp;&nbsp;<span class="output">READY</span><br/>
+<br/>
+<span class="dim">Total: ~10 hours at your own pace</span>
+</div>
+
+| Module | You'll Learn | You'll Build |
+|--------|-------------|-------------|
+| [**1. Foundations**](/claude-code-course/modules/1-foundations/) | CLI modes, slash commands, plan mode | `CLAUDE.md`, `permissions.deny`, custom command |
+| [**2. Skills**](/claude-code-course/modules/2-skills/) | Skills vs Commands, codify workflow | Reference skill, action skill in `.claude/skills/` |
+| [**3. Extensions**](/claude-code-course/modules/3-extensions/) | Hooks, MCP servers, advanced commands | `.claude/settings.json` hooks, `.mcp.json`, multi-step commands |
+| [**4. Agents**](/claude-code-course/modules/4-agents/) | Subagents, parallel patterns, worktrees | Parallel agent workflow, agent patterns in `CLAUDE.md` |
+| [**5. Workflows**](/claude-code-course/modules/5-workflows/) | Headless CLI, GitHub Actions, CI/CD | `.github/workflows/`, `scripts/claude-*.sh` |
+
+## What You'll Build
+
+```
+your-repo/
+├── CLAUDE.md                    # Project context, conventions, agent patterns
+├── .mcp.json                    # MCP server configurations
+├── .claude/
+│   ├── settings.json            # permissions.deny, hooks, security
+│   ├── skills/                  # Reusable team standards
+│   └── commands/                # Custom slash commands
+├── .github/workflows/
+│   └── claude-*.yml             # CI/CD with Claude reviews
+└── scripts/
+    └── claude-*.sh              # Headless automation
+```
+
+## Who Is This For?
+
+```bash
+$ claude --help roles
+```
+
+- `--frontend` — React, Vue, Angular, CSS, component libraries
+- `--backend` — APIs, databases, microservices, server-side
+- `--qa` — Test automation, E2E, integration testing
+- `--devops` — Infrastructure, CI/CD, containers, cloud
+- `--data` — Pipelines, analytics, ML, data engineering
+- `--fullstack` — Mix of frontend and backend
+
+No prior Claude Code experience needed.
+
+## Quick Start
+
+1. **Install the plugin**
+   ```bash
+   claude plugin marketplace add https://github.com/SeleznovIvan/claude-code-education
+   claude plugin install cc-course@claude-code-education
+   ```
+
+2. **Navigate to your project**
+   ```bash
+   cd /path/to/your/repo && claude
+   ```
+
+3. **One-time setup**
+   ```
+   /cc-course:setup
+   ```
+
+4. **Start learning**
+   ```
+   /cc-course:start 1
+   ```
+
+## Powered by Your Session History
+
+Most courses give everyone the same generic exercises. This one reads your actual Claude Code usage and adapts.
+
+The bundled **cclogviewer MCP** server parses your local Claude Code session logs, giving the course instructor (Claude itself) real-time access to how you work:
+
+<div class="cli-block">
+<span class="prompt">$</span> /cc-course:start 3<br/>
+<span class="dim">Analyzing your recent sessions...</span><br/>
+<span class="output">Found 12 sessions over 30 days</span><br/>
+<br/>
+<span class="dim">Based on your usage, I found patterns worth automating:</span><br/>
+<br/>
+<span class="prompt">1.</span> <strong>Prettier after writes</strong> — You ran prettier manually in 8 sessions<br/>
+<span class="prompt">2.</span> <strong>Test runner</strong> — You ran `npm test` after edits in 6 sessions<br/>
+<span class="prompt">3.</span> <strong>Lint check</strong> — You ran eslint in 5 sessions<br/>
+<br/>
+<span class="dim">Which one would you like to automate as a hook?</span><span class="cursor"></span>
+</div>
+
+This means every task — hooks, skills, commands, scripts — is grounded in what you **actually do**, not hypothetical scenarios. The course discovers your repeated workflows, suggests what to codify, and helps you build configurations that immediately save you time.
+
+---
+
+## For Educators & Teams
+
+This course is designed for both **self-study** and **instructor-led** delivery. Two built-in commands enable a complete homework submission and review workflow:
+
+<div class="cli-block">
+<span class="dim">── Student Side ──────────────────────────────────</span><br/>
+<span class="prompt">$</span> /cc-course:submit<br/>
+<span class="output">Packaging Module 1 submission...</span><br/>
+<span class="output">✓</span> Student work files collected<br/>
+<span class="output">✓</span> Progress snapshot saved<br/>
+<span class="output">✓</span> Session logs exported via MCP<br/>
+<span class="output">✓</span> Created: seminar1-jane-doe-2026-03-18.zip<br/>
+<br/>
+<span class="dim">── Instructor Side ───────────────────────────────</span><br/>
+<span class="prompt">$</span> /cc-course:review seminar1-jane-doe-2026-03-18.zip<br/>
+<span class="output">Launching reviewer agent...</span><br/>
+<span class="output">✓</span> Instructor report: reviews/instructor-report.pdf<br/>
+<span class="output">✓</span> Student feedback: reviews/student-feedback.pdf<br/>
+<span class="output">✓</span> Score: 87/100 across 5 dimensions<br/>
+</div>
+
+**`/cc-course:submit`** — Students package their completed module work into a zip archive containing their CLAUDE.md, commands, skills, hooks, session logs, and progress data. Share the zip with the instructor.
+
+**`/cc-course:review <path>`** — Instructors run a comprehensive AI-powered review of student submissions. Produces detailed feedback across 5 scoring dimensions, with separate reports for the instructor (full analysis) and the student (actionable feedback). Supports single submissions or batch review of an entire class.
+
+<CardGrid>
+  <Card title="Submission Packaging" icon="seti:zip">
+    Students run `/cc-course:submit` after completing a module. The zip includes all work artifacts, progress data, and session logs from the cclogviewer MCP.
+  </Card>
+  <Card title="AI-Powered Review" icon="star">
+    Instructors run `/cc-course:review` to get detailed scoring, PDF reports, and actionable feedback — powered by a dedicated reviewer agent.
+  </Card>
+</CardGrid>
+
+## Prerequisites
+
+<div class="cli-block">
+<span class="prompt">$</span> /cc-course:preflight-check<br/>
+<span class="output">[PASS]</span> GitHub repository to work on<br/>
+<span class="output">[PASS]</span> Claude Code installed (npm i -g @anthropic-ai/claude-code)<br/>
+<span class="output">[PASS]</span> Claude Pro or Max subscription ($20/mo)<br/>
+<span class="output">[PASS]</span> ~10 hours over 1-4 weeks<br/>
+<span class="output">[PASS]</span> No prior Claude Code experience required<br/>
+<br/>
+<span class="dim">All checks passed. Ready to start.</span>
+</div>
+
+---
+
+<p style="text-align: center; opacity: 0.5; font-size: 0.8rem; font-family: var(--sl-font-system-mono);">
+  Built by <a href="https://www.linkedin.com/in/ivan-seleznov-phd-65710213a/">Ivan Seleznov</a> ·
+  <a href="https://github.com/SeleznovIvan/claude-code-course-plugin">GitHub</a> ·
+  Not affiliated with Anthropic · MIT License
+</p>
