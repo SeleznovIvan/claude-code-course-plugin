@@ -25,7 +25,7 @@ Hooks are the most powerful extension mechanism in Claude Code because they oper
 
 #### Complete Hook Event Reference
 
-Claude Code defines 18 hook events. Each event fires at a specific point in the session lifecycle:
+Claude Code defines 22 hook events. Each event fires at a specific point in the session lifecycle:
 
 **Session lifecycle events:**
 
@@ -42,6 +42,7 @@ Claude Code defines 18 hook events. Each event fires at a specific point in the 
 |-------|--------------|-------------|
 | `UserPromptSubmit` | User submits a prompt (before Claude processes it) | Log prompts, validate input, inject context |
 | `Stop` | Claude stops generating a response | Send "task complete" notification, trigger follow-up actions |
+| `StopFailure` | Turn ends due to API error (rate_limit, authentication_failed, server_error) | Alert on failures, retry logic, error logging |
 
 **Tool lifecycle events:**
 
@@ -79,6 +80,14 @@ Claude Code defines 18 hook events. Each event fires at a specific point in the 
 | Event | When It Fires | Typical Use |
 |-------|--------------|-------------|
 | `PreCompact` | Before context compaction occurs | Save important context, flag critical information |
+| `PostCompact` | After context compaction completes | Verify critical context survived, log compaction details |
+
+**Elicitation events:**
+
+| Event | When It Fires | Typical Use |
+|-------|--------------|-------------|
+| `Elicitation` | MCP server requests user input | Log elicitation requests, auto-respond in CI |
+| `ElicitationResult` | User responds to MCP elicitation | Log responses, audit user decisions |
 
 #### What Each Event Matches On
 
@@ -93,8 +102,12 @@ Different events use different matching criteria:
 | `SessionStart` | Session source | `""` (matches all) |
 | `Notification` | Notification type | `""` (matches all) |
 | `Stop` | Empty string | `""` (matches all stops) |
+| `StopFailure` | Error type | `"rate_limit"`, `"authentication_failed"`, `"server_error"` |
 | `SubagentStart` | Agent identifier | `""` (matches all) |
 | `SubagentStop` | Agent identifier | `""` (matches all) |
+| `PostCompact` | Compaction type | `"manual"`, `"auto"` |
+| `Elicitation` | MCP server name | `"mcp__github"`, `""` (matches all) |
+| `ElicitationResult` | MCP server name | `"mcp__github"`, `""` (matches all) |
 | Others | Varies | `""` (matches all) |
 
 #### Hook Execution Model
@@ -139,7 +152,7 @@ Hooks support four handler types, each suited to different use cases:
 - Execution: Sends HTTP POST with event context as JSON body
 - Input: Event context sent as request body
 - Output: Response status determines behavior (2xx = success)
-- Timeout: 600 seconds (default)
+- Timeout: 30 seconds (default)
 - Example: `"url": "https://hooks.slack.com/services/T.../B.../xxx"`
 
 **`prompt` — LLM yes/no decision**
@@ -208,7 +221,7 @@ The four handler type schemas:
   "type": "http",
   "url": "https://example.com/webhook",
   "headers": { "Authorization": "Bearer ${TOKEN}" },
-  "timeout": 600
+  "timeout": 30
 }
 
 // prompt type — ask the LLM a yes/no question
@@ -223,6 +236,27 @@ The four handler type schemas:
   "type": "agent",
   "prompt": "Review these changes for security issues.",
   "timeout": 60
+}
+```
+
+#### Optional Handler Fields
+
+All handler types support these additional optional fields:
+
+| Field | Type | Applies To | Description |
+|-------|------|-----------|-------------|
+| `timeout` | number | All types | Override the default timeout in seconds |
+| `statusMessage` | string | All types | Custom spinner message displayed while the hook runs (e.g., `"Running security scan..."`) |
+| `async` | boolean | `command` only | When `true`, the hook runs in the background without blocking Claude. Useful for logging, notifications, or other fire-and-forget operations |
+
+**Example with optional fields:**
+```json
+{
+  "type": "command",
+  "command": "python3 /path/to/audit-log.py",
+  "timeout": 10,
+  "statusMessage": "Logging action to audit trail...",
+  "async": true
 }
 ```
 
@@ -248,6 +282,33 @@ The `matcher` field is a regular expression matched against a value that depends
 
 **Important**: Tool names are case-sensitive. The tool name is `Write`, not `write` or `write_file`. Common tool names: `Write`, `Edit`, `Read`, `Bash`, `Glob`, `Grep`, `WebFetch`, `WebSearch`, `EnterWorktree`, `ExitWorktree`, `NotebookEdit`. MCP tools follow the pattern `mcp__servername__toolname`.
 
+#### Matcher Format Variants
+
+There are two supported formats for the `matcher` field:
+
+**Format A — String regex** (documented standard):
+```json
+{ "matcher": "Write|Edit" }
+```
+The value is a regular expression matched against the tool name (or other event-specific value).
+
+**Format B — Object with tools array** (newer versions):
+```json
+{ "matcher": { "tools": ["WriteTool", "EditTool"] } }
+```
+This format uses an explicit list of internal tool names. Note that the internal tool names differ from the display names used in Format A:
+
+| Display Name (Format A) | Internal Name (Format B) |
+|------------------------|-------------------------|
+| `Bash` | `BashTool` |
+| `Write` | `WriteTool` |
+| `Edit` | `EditTool` |
+| `Read` | `ReadTool` |
+| `Glob` | `GlobTool` |
+| `Grep` | `GrepTool` |
+
+**Which format to use**: Start with Format A (string regex) — it is the documented standard and works in all versions. If Claude Code rejects the string format with an error about "new format with matchers", switch to Format B (object with tools array).
+
 #### Stdin JSON Format by Event
 
 Hooks receive event context as JSON on stdin. The structure varies by event:
@@ -256,7 +317,9 @@ Hooks receive event context as JSON on stdin. The structure varies by event:
 ```json
 {
   "session_id": "abc123",
+  "transcript_path": "/path/to/transcript.jsonl",
   "cwd": "/path/to/project",
+  "permission_mode": "default",
   "hook_event_name": "PreToolUse",
   "tool_name": "Write",
   "tool_input": {
@@ -270,7 +333,9 @@ Hooks receive event context as JSON on stdin. The structure varies by event:
 ```json
 {
   "session_id": "abc123",
+  "transcript_path": "/path/to/transcript.jsonl",
   "cwd": "/path/to/project",
+  "permission_mode": "default",
   "hook_event_name": "PostToolUse",
   "tool_name": "Write",
   "tool_input": {
@@ -284,7 +349,17 @@ Hooks receive event context as JSON on stdin. The structure varies by event:
 }
 ```
 
-Other events (Stop, SessionStart, etc.) follow the same pattern with `session_id`, `cwd`, and `hook_event_name`, plus event-specific fields (e.g., `stop_hook_active` for Stop).
+Other events (Stop, SessionStart, etc.) follow the same pattern with `session_id`, `transcript_path`, `cwd`, `permission_mode`, and `hook_event_name`, plus event-specific fields (e.g., `stop_hook_active` for Stop).
+
+**Common fields in all stdin JSON:**
+
+| Field | Description |
+|-------|-------------|
+| `session_id` | Unique identifier for the current session |
+| `transcript_path` | Path to the session transcript JSONL file |
+| `cwd` | Current working directory |
+| `permission_mode` | Current permission mode: `default`, `plan`, `acceptEdits`, `dontAsk`, or `bypassPermissions` |
+| `hook_event_name` | Name of the event that triggered the hook |
 
 #### `tool_input` Structure per Tool
 
@@ -366,7 +441,7 @@ Each handler type has a default timeout. You can override these in the handler c
 | Handler Type | Default Timeout | Configurable |
 |-------------|----------------|-------------|
 | `command` | 600 seconds (10 min) | Yes, via `"timeout"` field |
-| `http` | 600 seconds (10 min) | Yes, via `"timeout"` field |
+| `http` | 30 seconds | Yes, via `"timeout"` field |
 | `agent` | 60 seconds (1 min) | Yes, via `"timeout"` field |
 | `prompt` | 30 seconds | Yes, via `"timeout"` field |
 

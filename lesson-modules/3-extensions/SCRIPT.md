@@ -174,7 +174,7 @@ Hook configuration uses a **3-level hierarchy**: event name → array of matcher
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": { "tools": ["WriteTool", "EditTool"] },
         "hooks": [
           {
             "type": "command",
@@ -185,7 +185,7 @@ Hook configuration uses a **3-level hierarchy**: event name → array of matcher
     ],
     "PostToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": { "tools": ["WriteTool", "EditTool"] },
         "hooks": [
           {
             "type": "command",
@@ -198,11 +198,13 @@ Hook configuration uses a **3-level hierarchy**: event name → array of matcher
 }
 ```
 
+> **Matcher format**: The `matcher` field uses an object with a `tools` array. Tool names use the "Tool" suffix: `BashTool`, `WriteTool`, `EditTool`, `ReadTool`, `GlobTool`, `GrepTool`. Some Claude Code versions also accept a legacy string regex format (`"matcher": "Write|Edit"`), but the object format above is the current standard.
+
 **Structure breakdown:**
 
 1. **Level 1** — `"hooks"` object with event names as keys (`PreToolUse`, `PostToolUse`, etc.)
 2. **Level 2** — Each event has an array of **matcher groups**. Each group has:
-   - `"matcher"`: regex pattern matching tool names
+   - `"matcher"`: object with `"tools"` array listing tool names to match
    - `"hooks"`: array of handler objects
 3. **Level 3** — Each handler object has:
    - `"type"`: handler type (`"command"`, `"http"`, `"prompt"`, `"agent"`)
@@ -210,22 +212,36 @@ Hook configuration uses a **3-level hierarchy**: event name → array of matcher
 
 #### Matcher Field
 
-The `matcher` is a **regex pattern** that matches against tool names. Tool names in Claude Code are:
+The `matcher` filters which tool calls trigger your hook. There are **two supported formats** depending on your Claude Code version:
 
-| Tool Name | What It Does |
-|-----------|-------------|
-| `Bash` | Shell command execution |
-| `Write` | File creation/overwrite |
-| `Edit` | File editing (find-replace) |
-| `Read` | File reading |
-| `Glob` | File pattern search |
-| `Grep` | Content search |
-| `mcp__.*` | Any MCP tool (regex pattern) |
+**Format A — String regex** (documented standard):
+```json
+{ "matcher": "Write|Edit" }
+```
 
-**Matcher examples:**
+**Format B — Object with tools array** (newer versions):
+```json
+{ "matcher": { "tools": ["WriteTool", "EditTool"] } }
+```
+
+> **If you get a format error** about matchers when starting Claude, switch to the other format. Tool names in object format use a "Tool" suffix: `BashTool`, `WriteTool`, `EditTool`, `ReadTool`, `GlobTool`, `GrepTool`.
+
+**Tool names reference** (string format → object format):
+
+| String Format | Object Format | What It Does |
+|--------------|---------------|-------------|
+| `Bash` | `BashTool` | Shell command execution |
+| `Write` | `WriteTool` | File creation/overwrite |
+| `Edit` | `EditTool` | File editing (find-replace) |
+| `Read` | `ReadTool` | File reading |
+| `Glob` | `GlobTool` | File pattern search |
+| `Grep` | `GrepTool` | Content search |
+| `mcp__.*` | — | Any MCP tool (regex, string format only) |
+
+**Matcher examples (string format):**
 - `"Write|Edit"` — matches file write or edit operations
 - `"Bash"` — matches shell command execution
-- `""` (empty string) — matches **all** tools
+- `""` (empty string) or `"*"` — matches **all** tools
 - `"mcp__github__.*"` — matches all GitHub MCP tools
 
 #### Hook Input (stdin)
@@ -257,60 +273,70 @@ Parse it in your command with `jq`: `echo $INPUT | jq -r '.tool_input.file_path'
 
 #### Environment Variables
 
-| Variable | Description |
-|----------|-------------|
-| `$CLAUDE_PROJECT_DIR` | Root directory of the project |
-| `$CLAUDE_SESSION_ID` | Current session identifier |
+| Variable | Description | Availability |
+|----------|-------------|-------------|
+| `$CLAUDE_PROJECT_DIR` | Root directory of the project | All hooks |
+| `$CLAUDE_ENV_FILE` | Path to env file for persisting vars | SessionStart hooks only |
+
+> **Note**: The session ID is available in the **stdin JSON** (as `session_id`), not as an environment variable. Access it with: `echo $INPUT | jq -r '.session_id'`
 
 #### Handler Type Examples
 
-**Command handler** (most common):
+**Command handler** (most common, default timeout: 600s):
 ```json
 {
   "type": "command",
-  "command": "npx prettier --write \"$CLAUDE_PROJECT_DIR/$(echo $INPUT | jq -r '.tool_input.file_path')\""
+  "command": "npx prettier --write \"$CLAUDE_PROJECT_DIR/$(echo $INPUT | jq -r '.tool_input.file_path')\"",
+  "timeout": 30
 }
 ```
 
-**HTTP handler** (webhooks):
+**HTTP handler** (webhooks, default timeout: 30s):
 ```json
 {
   "type": "http",
   "url": "https://hooks.slack.com/services/T00/B00/xxx",
-  "method": "POST"
+  "timeout": 30
 }
 ```
 
-**Prompt handler** (LLM decision):
+**Prompt handler** (LLM decision, default timeout: 30s):
 ```json
 {
   "type": "prompt",
-  "prompt": "Review this file write and decide if it follows our coding standards. If not, explain why."
+  "prompt": "Review this file write and decide if it follows our coding standards. If not, explain why.",
+  "timeout": 30
 }
 ```
 
-**Agent handler** (subagent with tools):
+**Agent handler** (subagent with tools, default timeout: 60s):
 ```json
 {
   "type": "agent",
-  "prompt": "Analyze the written file for security vulnerabilities and report findings."
+  "prompt": "Analyze the written file for security vulnerabilities and report findings.",
+  "timeout": 60
 }
 ```
+
+**Optional fields for all handlers:**
+- `timeout` — Override the default timeout (in seconds)
+- `statusMessage` — Custom message shown in spinner while hook runs (e.g., `"Formatting code..."`)
+- `async` — Set to `true` for command hooks to run in background without blocking
 
 #### Role-Specific Hook Ideas
 
 | Role | Hook | Event & Matcher | What It Does |
 |------|------|----------------|--------------|
-| Frontend | Auto-format with Prettier | `PostToolUse`, matcher: `Write\|Edit` | Runs prettier on saved files |
-| Backend | Type-check after changes | `PostToolUse`, matcher: `Write\|Edit` | Runs mypy/pyright on Python files |
-| QA | Auto-run related tests | `PostToolUse`, matcher: `Write` | Runs test runner when test files change |
-| DevOps | Validate config syntax | `PreToolUse`, matcher: `Write` | Validates YAML/JSON, blocks on syntax error |
-| Data | Validate schema | `PostToolUse`, matcher: `Write\|Edit` | Runs schema validation on model files |
+| Frontend | Auto-format with Prettier | `PostToolUse`, tools: `["WriteTool", "EditTool"]` | Runs prettier on saved files |
+| Backend | Type-check after changes | `PostToolUse`, tools: `["WriteTool", "EditTool"]` | Runs mypy/pyright on Python files |
+| QA | Auto-run related tests | `PostToolUse`, tools: `["WriteTool"]` | Runs test runner when test files change |
+| DevOps | Validate config syntax | `PreToolUse`, tools: `["WriteTool"]` | Validates YAML/JSON, blocks on syntax error |
+| Data | Validate schema | `PostToolUse`, tools: `["WriteTool", "EditTool"]` | Runs schema validation on model files |
 
 ### Instructor: Checkpoint
 
 Ask the student using AskUserQuestion:
-- **Question**: "Do you understand the 3-level hook structure (event → matcher group → handler array) and how matchers use regex to match tool names?"
+- **Question**: "Do you understand the 3-level hook structure (event → matcher group with `tools` array → handler array)? Tool names use the 'Tool' suffix: `BashTool`, `WriteTool`, `EditTool`, etc."
 - **Options**: "Yes, I understand the structure" / "I have a question about the format" / "Can you show the structure breakdown again?"
 - On questions: answer them, then re-ask
 - On "show again": re-present the 3-level breakdown with the JSON example, highlighting each level, then re-ask
@@ -378,7 +404,7 @@ Here's the template for your hook — I'll fill in the details based on your cho
   \"hooks\": {
     \"[Event]\": [
       {
-        \"matcher\": \"[ToolRegex]\",
+        \"matcher\": { \"tools\": [\"[ToolName]\"] },
         \"hooks\": [
           {
             \"type\": \"command\",
