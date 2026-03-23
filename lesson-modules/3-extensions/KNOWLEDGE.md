@@ -282,32 +282,27 @@ The `matcher` field is a regular expression matched against a value that depends
 
 **Important**: Tool names are case-sensitive. The tool name is `Write`, not `write` or `write_file`. Common tool names: `Write`, `Edit`, `Read`, `Bash`, `Glob`, `Grep`, `WebFetch`, `WebSearch`, `EnterWorktree`, `ExitWorktree`, `NotebookEdit`. MCP tools follow the pattern `mcp__servername__toolname`.
 
-#### Matcher Format Variants
+#### Official Hook-Development Skill
 
-There are two supported formats for the `matcher` field:
+Anthropic provides a comprehensive `hook-development` skill in the `plugin-dev` plugin ([source](https://github.com/anthropics/claude-code/blob/main/plugins/plugin-dev/skills/hook-development/SKILL.md)). Install via `/plugins` → Discover → `plugin-dev`. It covers:
 
-**Format A — String regex** (documented standard):
+- Prompt-based hooks (recommended for complex validation)
+- Security patterns (input validation, path safety)
+- Debugging with `claude --debug`
+- Plugin vs settings hook format differences
+- Complete examples for all event types
+
+**Prompt-based hooks** are recommended over command hooks for most use cases. They use LLM reasoning for context-aware decisions without bash scripting:
+
 ```json
-{ "matcher": "Write|Edit" }
+{
+  "type": "prompt",
+  "prompt": "Validate file write safety. Check: system paths, credentials, path traversal. Return 'approve' or 'deny'.",
+  "timeout": 30
+}
 ```
-The value is a regular expression matched against the tool name (or other event-specific value).
 
-**Format B — Object with tools array** (newer versions):
-```json
-{ "matcher": { "tools": ["WriteTool", "EditTool"] } }
-```
-This format uses an explicit list of internal tool names. Note that the internal tool names differ from the display names used in Format A:
-
-| Display Name (Format A) | Internal Name (Format B) |
-|------------------------|-------------------------|
-| `Bash` | `BashTool` |
-| `Write` | `WriteTool` |
-| `Edit` | `EditTool` |
-| `Read` | `ReadTool` |
-| `Glob` | `GlobTool` |
-| `Grep` | `GrepTool` |
-
-**Which format to use**: Start with Format A (string regex) — it is the documented standard and works in all versions. If Claude Code rejects the string format with an error about "new format with matchers", switch to Format B (object with tools array).
+Reserve `command` type hooks for fast, deterministic checks (formatting, linting).
 
 #### Stdin JSON Format by Event
 
