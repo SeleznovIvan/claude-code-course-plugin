@@ -179,7 +179,7 @@ The plugin is configured via `.claude-plugin/plugin.json`:
 ```json
 {
   "name": "cc-course",
-  "version": "0.12.0-alpha",
+  "version": "1.1.0",
   "description": "Interactive Claude Code developer course with 5 modules",
   "skills": "./skills/",
   "mcpServers": "./.mcp.json"

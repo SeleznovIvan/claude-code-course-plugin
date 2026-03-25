@@ -44,6 +44,7 @@ export default defineConfig({
 				{ label: 'Home', slug: '' },
 				{ label: 'Getting Started', slug: 'getting-started' },
 				{ label: 'Commands', slug: 'commands' },
+				{ label: 'Changelog', slug: 'changelog' },
 				{
 					label: 'Modules',
 					items: [

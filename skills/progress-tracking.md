@@ -124,7 +124,8 @@ For progress files created before versioning:
     "role": "frontend | backend | QA | DevOps | data | fullstack | null",
     "repository": "string | null",
     "started_at": "ISO timestamp | null",
-    "mcp_project_name": "string | null"
+    "mcp_project_name": "string | null",
+    "teaching_mode": "sensei | coach | copilot | null (defaults to coach)"
   },
   "modules": {
     "1-foundations-and-commands": {

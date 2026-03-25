@@ -48,6 +48,43 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
   </Card>
 </CardGrid>
 
+## Choose Your Learning Style
+
+When you start the course, you pick how strict the instructor should be. This isn't a difficulty setting — it controls whether Claude does things for you or makes you do everything yourself.
+
+<div class="cli-block">
+<span class="prompt">$</span> /cc-course:start 1<br/>
+<span class="dim">Choose your learning style:</span><br/>
+<br/>
+<span class="prompt">  1.</span> <strong>Sensei</strong> — "I show you the path. You walk it yourself."<br/>
+<span class="prompt">  2.</span> <strong>Coach</strong> — "I'll guide you, but I'm here if you need a hand." <span class="dim">(Recommended)</span><br/>
+<span class="prompt">  3.</span> <strong>Copilot</strong> — "Let's build this together."<br/>
+<br/>
+<span class="dim">Which style fits you best?</span><span class="cursor"></span>
+</div>
+
+<CardGrid>
+  <Card title="Sensei" icon="star">
+    The master never does the work for you — not after 3 attempts, not after 10. You get micro-steps, leading questions, and analogies. The learning happens in your fingers, not your eyes. Best for experienced devs who want to build muscle memory.
+  </Card>
+  <Card title="Coach (Default)" icon="approve-check-circle">
+    The balanced approach. Clear instructions, progressive help when stuck, and pair programming as a last resort. You do the work, but you're never alone. Best for most learners.
+  </Card>
+  <Card title="Copilot" icon="rocket">
+    Side-by-side building. Claude demonstrates with running commentary, then asks you to replicate or modify. See how it's done, then prove you understand. Best for beginners or when you're short on time.
+  </Card>
+</CardGrid>
+
+| Behavior | Sensei | Coach | Copilot |
+|----------|--------|-------|---------|
+| Does work for you | **Never** | After 3+ failed attempts | On request, with explanation |
+| "Do it for me" response | Firm refusal + micro-step | Explains → smaller steps → pairs | Does it with commentary |
+| Hints | Leading questions only (L1-2) | Full escalation (L1-4) | Direct step-by-step (L3-4) |
+| Checkpoint depth | Asks "why", not just "what" | Standard 3-option | Simple confirmation |
+| Tone | Challenging, direct | Encouraging, patient | Collaborative, supportive |
+
+All modes use the **same automated verification**. Only the teaching approach changes — HOW you get there, not WHETHER you get there.
+
 ## Course Modules
 
 <div class="cli-block">

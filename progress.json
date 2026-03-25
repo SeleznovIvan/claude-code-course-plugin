@@ -5,7 +5,8 @@
     "role": null,
     "repository": null,
     "started_at": null,
-    "mcp_project_name": null
+    "mcp_project_name": null,
+    "teaching_mode": null
   },
   "modules": {
     "1-foundations-and-commands": {

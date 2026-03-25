@@ -1,0 +1,90 @@
+---
+title: Changelog
+description: Release history for the Claude Code Developer Course.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+All notable changes to the Claude Code Developer Course.
+
+---
+
+## v1.1.0 — Teaching Modes & Student Feedback
+
+<Aside type="tip">Latest release</Aside>
+
+### Teaching Modes
+
+3 selectable learning styles — choose when you start the course:
+
+| Mode | Philosophy | Best For |
+|------|-----------|----------|
+| **Sensei** | "I show you the path. You walk it yourself." | Experienced devs who want muscle memory |
+| **Coach** | "I'll guide you, but I'm here if you need a hand." | Most learners (default) |
+| **Copilot** | "Let's build this together." | Beginners or time-constrained |
+
+Mode affects how the instructor handles the ACTION phase, hints, and "stuck" situations. Verification is identical across all modes.
+
+### Security: permissions.deny
+
+Replaced `.claudeignore` (which never existed in Claude Code) with the official `permissions.deny` mechanism in `.claude/settings.json`:
+
+```json
+{
+  "permissions": {
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)"
+    ]
+  }
+}
+```
+
+### Hooks Accuracy
+
+- Fixed matcher format to **string regex** (`"matcher": "Write|Edit"`) — verified against [official Anthropic repo](https://github.com/anthropics/claude-code/blob/main/plugins/plugin-dev/skills/hook-development/SKILL.md)
+- Fixed HTTP hook timeout default (600s → 30s)
+- Added reference to official `hook-development` skill in plugin-dev plugin
+- Prompt-based hooks now recommended over command hooks
+- Added 4 missing events: StopFailure, PostCompact, Elicitation, ElicitationResult
+
+### Student Feedback Fixes
+
+- "Never skip failed tasks" rule — Claude won't mark steps complete if they didn't work
+- Commands restart note — custom commands load at session start
+- Statusline fallback — graceful handling when `/statusline` doesn't work
+- `/clear` flow fixed — no more recursion after context reset
+- CLAUDE.md loading clarity — what auto-loads vs on-demand
+
+---
+
+## v1.0.2 — Hooks Format Fix
+
+Reverted incorrect object matcher format. Confirmed via official docs and Anthropic repo that matcher is always a string regex.
+
+**Before (wrong):** `"matcher": {"tools": ["WriteTool"]}`
+**After (correct):** `"matcher": "Write|Edit"`
+
+---
+
+## v1.0.1 — Hooks Accuracy
+
+- HTTP hook timeout: 600s → 30s
+- Added 4 missing hook events (22 total)
+- Added handler optional fields: `timeout`, `statusMessage`, `async`
+- Added stdin JSON fields: `transcript_path`, `permission_mode`
+
+---
+
+## v1.0.0 — Complete Interactive Course
+
+The initial release with all 5 modules fully interactive.
+
+- **Modules 3-5 rewritten** with PRESENT → CHECKPOINT → ACTION → VERIFY flow
+- **KNOWLEDGE.md** companion files for Modules 3, 4, 5
+- **cclogviewer MCP** session-based personalization
+- **Submit + Review** workflow for instructor-led cohorts
+- **Course website** with CLI terminal theme
+- Hooks in correct 3-level format
+- MCP config at `.mcp.json` (project root)

@@ -98,6 +98,15 @@ Create the following structure in the student's repository:
    }
    ```
 3. Ask the user for their name and role (if not already set)
+4. Ask the user for their teaching mode (if not already set). Use AskUserQuestion with these options:
+
+   **Question**: "Choose your learning style:"
+   **Options**:
+   - "Sensei — I show you the path. You walk it yourself." — Strictest mode. I never do the work for you, no matter how many times you ask. You learn by doing everything yourself. Best for experienced developers who want to build muscle memory.
+   - "Coach — I'll guide you, but I'm here if you need a hand. (Recommended)" — Balanced mode. I guide you through tasks and help if you get stuck after trying. Default choice for most learners.
+   - "Copilot — Let's build this together." — Most hands-on. I'll demonstrate and we'll work side by side. Best for beginners or when you're short on time.
+
+   Save the selection to `student.teaching_mode` in progress.json as `"sensei"`, `"coach"`, or `"copilot"`.
 
 ### Directory Creation
 

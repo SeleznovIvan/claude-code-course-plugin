@@ -4,12 +4,23 @@ Hint logic shared by course subcommands.
 
 ## Hint Levels
 
-Hints escalate if the learner keeps asking:
+Hints escalate if the learner keeps asking. **Behavior depends on teaching mode** (read `student.teaching_mode` from progress.json):
 
+### Sensei Mode (`sensei`)
+- **Level 1**: Leading question — "What kind of file stores project settings for Claude Code?"
+- **Level 2**: Narrower guidance — "The file lives in `.claude/`. What settings would block reading `.env` files?"
+- **Levels 3-4**: NOT available. Instead, keep breaking into micro-steps and asking Socratic questions. Never give the direct answer.
+
+### Coach Mode (`coach`) — DEFAULT
 1. **Level 1**: Gentle nudge in the right direction
 2. **Level 2**: More specific guidance
 3. **Level 3**: Step-by-step walkthrough
 4. **Level 4**: Do it together (pair programming)
+
+### Copilot Mode (`copilot`)
+- **Start at Level 3**: Give direct, step-by-step guidance immediately
+- **Level 4**: Do it together with running commentary — explain each step as you go
+- Skip Levels 1-2 (Copilot learners want direct answers, not nudges)
 
 Track hint level in progress.json under current task.
 

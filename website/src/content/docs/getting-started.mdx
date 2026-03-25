@@ -122,6 +122,22 @@ If the automatic setup fails, you can install the MCP server manually:
 You can start any module directly with `/cc-course:start N` (where N is 1-5), but modules build on each other. Starting with Module 1 is strongly recommended.
 </Aside>
 
+## Teaching Mode Selection
+
+On your first start, Claude will ask you to choose a learning style:
+
+| Mode | Description | Best For |
+|------|-------------|----------|
+| **Sensei** | Never does the work for you. Gives micro-steps, leading questions, analogies. | Experienced devs, building muscle memory |
+| **Coach** (default) | Guides you, helps when stuck, pair-programs as last resort. | Most learners |
+| **Copilot** | Demonstrates alongside you, explains each step, asks you to replicate. | Beginners, time-constrained |
+
+Your choice persists across sessions. All modes use the same automated verification — only the teaching approach changes.
+
+<Aside type="note">
+You can change your teaching mode later by editing `teaching_mode` in your `.claude/claude-course/progress.json` file. Valid values: `"sensei"`, `"coach"`, `"copilot"`.
+</Aside>
+
 ## How the Course Works
 
 The course runs entirely inside Claude Code. There are no videos, slides, or external materials to read. Here is the learning flow:
